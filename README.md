@@ -51,6 +51,24 @@ let symbolsBisLayer: Rule = holdTapLayer("␣")
   .description("Symbols layer")
 ```
 
+You can define sub-layers like so:
+
+```typescript
+  .permissiveHoldManipulators(
+    // Necessary: https://github.com/evan-liu/karabiner.ts/issues/171.
+    map("l⇧").to(toSetVar("shift-mode", 1)).toAfterKeyUp(toSetVar("shift-mode", 0)),
+    ...withCondition(ifVar("shift-mode"))([
+      // …
+      map("m").to("!"),
+      map(",").to("@"),
+      map(".").to("# ),
+      // …
+    ]) as BasicManipulator[],
+    // …
+    map("m").to("1"),
+    // …
+```
+
 #### Limitations
 
 The ability to replay keys doesn’t come for free.
