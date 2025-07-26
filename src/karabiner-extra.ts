@@ -23,6 +23,7 @@ import {
   SideModifierAlias,
   Modifier,
   ToKeyParam,
+  getKeyWithAlias,
 } from 'karabiner.ts';
 
 export type FromAndToKeyParam = FromKeyParam & ToKeyParam;

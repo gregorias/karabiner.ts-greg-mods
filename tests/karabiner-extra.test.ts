@@ -7,6 +7,7 @@ import {
 } from '../src/karabiner-extra';
 import {
   BasicManipulator,
+  map,
   Modifier,
   SideModifierAlias,
 } from 'karabiner.ts';
@@ -80,6 +81,11 @@ describe('getFromKeyCodeFromBasicManipulator', () => {
       from: { key_code: 'a' },
     };
     expect(getFromKeyCodeFromBasicManipulator(manipulator)).toBe('a');
+  });
+
+  it('should return the key code from a key alias manipulator', () => {
+    expect(getFromKeyCodeFromBasicManipulator(map('␣').to("b").build()[0]))
+      .toBe('spacebar');
   });
 
   it('should return null if from does not have key_code', () => {

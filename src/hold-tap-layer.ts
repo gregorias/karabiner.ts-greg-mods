@@ -39,6 +39,8 @@ import {
   ToEventOptions,
   ToEvent,
   Condition,
+  FromAndToKeyCode,
+  getKeyWithAlias,
 } from "karabiner.ts"
 import { BasicManipulatorBuilder, FromAndToKeyParam, getFromKeyCodeFromBasicManipulator, isFromAndToKeyCode } from "./karabiner-extra";
 
@@ -68,14 +70,14 @@ function applyConditionToToEvents(m: BasicManipulator, cond: Condition) {
  * The hold-tap layer builder.
  */
 export class HoldTapLayerBuilder {
-  private key: LayerKeyParam;
+  private key: FromAndToKeyCode;
   private layer_builder: ReturnType<typeof layer>;
   private ruleDescription?: string;
   private configKeyOptionalMods?: Modifier[] | ['any'];
   private tappingTermMs?: number;
 
-  constructor(key: LayerKeyParam) {
-    this.key = key;
+  constructor(key: LayerKeyParam & FromAndToKeyParam) {
+    this.key = getKeyWithAlias<FromAndToKeyCode>(key);
     this.layer_builder = layer(key).configKey(
       (v) => v
         // Set the start variable to prevent slow keys from acting with the modifier.
