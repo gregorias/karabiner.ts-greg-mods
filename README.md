@@ -87,7 +87,7 @@ as an echo key. I just provide a list of all keys on my keyboard as echo keys.
 `hrm` is turn-key solution for configuring home row mods that utilizes
 the features of the hold-tap layer. It provides quite snappy experience as
 it provides responsiveness with permissive-hold and chordal-hold strategies
-(both optional) while also not losing keys during accidental roll over (mostly).
+(both optional) while also not losing keys during accidental roll overs (mostly).
 
 ```typescript
 const leftHandKeys = ["q" /*…*/, , "b"];
