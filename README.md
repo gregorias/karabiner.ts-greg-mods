@@ -1,10 +1,10 @@
 # ⌨️ Greg’s Karabiner.ts Mods
 
 This TS package contains [Karabiner.ts][karabiner.ts] recipes for QMK-like
-layers (hold-tap, mod-tap) with powerful features
-([permissive-hold][permissive-hold], chordal hold, hold on key press).
+layers (namely: hold-tap and mod-tap) with powerful QMK features:
+[permissive-hold][permissive-hold], chordal hold, and hold on key press.
 This package builds upon these layers to provide the first turn-key solution
-for home row mods that doesn’t suck.
+for home row mods that works almost like on a QMK keyboard, i.e., it’s good.
 
 ## 📦 Installation
 
@@ -28,8 +28,8 @@ In addition to the default, hold-on-key-press decision mode, you can also use
 permissive-hold and the slow-mode (wait for the tapping term to elapse).
 
 If you don’t activate the hold, e.g., you quickly roll over two keys during
-writing. This layer replays the layer and the other key, so you no longer
-lose your keystrokes accidentally.
+writing, this layer replays the layer and the other key.
+With this layer, you don’t lose your keystrokes during simple roll overs.
 
 ```typescript
 // A symbols layer activated with ␣.
