@@ -40,6 +40,7 @@ export function isFromAndToKeyCode(key: string | number): key is FromAndToKeyCod
 }
 
 export type Side = 'left' | 'right';
+export const sides: Side[] = ['left', 'right'];
 
 /**
  * Returns the side of a sided modifier alias or Modifier or null if not sided.

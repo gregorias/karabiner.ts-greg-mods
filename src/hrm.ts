@@ -32,6 +32,7 @@ import {
   isFromAndToKeyCode,
   isSidedMod,
   Side,
+  sides,
 } from "./karabiner-extra";
 
 /**
@@ -222,21 +223,26 @@ export class HrmBuilder {
     const hrmKeys = this.hrmKeys;
     let manipulators: Manipulator[] = [];
 
-    for (const [first, second, third] of getTriples(hrmKeys.keys())) {
-      manipulators = manipulators.concat(modTap()
-        .from([first, second, third], [], "any")
-        .modifiers(toKey(hrmKeys.get(first) as ToKeyParam, [
-          hrmKeys.get(second) as SideModifierAlias,
-          hrmKeys.get(third) as SideModifierAlias]))
-        .permissive(true)
-        .build())
-    }
-    for (const [first, second] of getDoubles(hrmKeys.keys())) {
-      manipulators = manipulators.concat(modTap()
-        .from([first, second], [], "any")
-        .modifiers(toKey(hrmKeys.get(first) as ToKeyParam, hrmKeys.get(second)))
-        .permissive(true)
-        .build())
+    for (const side of sides) {
+      const sideKeys: HrmKeyParam[] = Array.from(hrmKeys.keys())
+        .filter(k => getSideOfMod(hrmKeys.get(k) as SideModifierAlias) === side);
+
+      for (const [first, second, third] of getTriples(sideKeys)) {
+        manipulators = manipulators.concat(modTap()
+          .from([first, second, third], [], "any")
+          .modifiers(toKey(hrmKeys.get(first) as ToKeyParam, [
+            hrmKeys.get(second) as SideModifierAlias,
+            hrmKeys.get(third) as SideModifierAlias]))
+          .permissive(true)
+          .build())
+      }
+      for (const [first, second] of getDoubles(sideKeys)) {
+        manipulators = manipulators.concat(modTap()
+          .from([first, second], [], "any")
+          .modifiers(toKey(hrmKeys.get(first) as ToKeyParam, hrmKeys.get(second)))
+          .permissive(true)
+          .build())
+      }
     }
 
     return manipulators;
