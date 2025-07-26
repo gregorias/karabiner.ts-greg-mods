@@ -13,6 +13,9 @@ import {
   KeyAlias,
   LayerKeyParam,
   Manipulator,
+  Modifier,
+  ModifierParam,
+  parseModifierParam,
   SideModifierAlias,
   toKey,
   ToKeyParam,
@@ -72,6 +75,34 @@ export type HrmKeyboardLayout = {
 
 export type HoldTapStrategy = 'permissive-hold' | 'hold-on-other-key-press' | 'slow'
 
+class SmartModifierManipulatorMap {
+  private smartManipulators: Map<Modifier, BasicManipulator[]> = new Map();
+
+  public getSmartManipulators(modifierParam: ModifierParam): BasicManipulator[] {
+    let modifiers = parseModifierParam(modifierParam);
+    if (!modifiers || modifiers.length != 1) {
+      throw new Error(`Expected a single modifier, but got ${JSON.stringify(modifierParam)}.`);
+    }
+    let modifier = modifiers[0];
+    // TODO: Implement.
+    return [];
+  };
+
+  public addSmartManipulator(modifierParam: ModifierParam, manipulator: BasicManipulator): this {
+    let modifiers = parseModifierParam(modifierParam);
+    if (!modifiers || modifiers.length != 1) {
+      throw new Error(`Expected a single modifier, but got ${JSON.stringify(modifierParam)}.`);
+    }
+    let modifier = modifiers[0];
+
+    this.smartManipulators.set(
+      modifier,
+      (this.smartManipulators.get(modifier) ?? []).concat(manipulator)
+    );
+    return this;
+  }
+}
+
 export class HrmBuilder {
   // A map of keys to their modifiers, e.g., a ⇒ ⌃, s ⇒ ⌥, d ⇒ ⇧.
   private readonly hrmKeys: Map<HrmKeyParam, HrmMod>;
@@ -79,6 +110,9 @@ export class HrmBuilder {
   private extraPermissiveManipulators:
     Map<HrmMod, (Manipulator | BasicManipulatorBuilder)[]> = new Map();
   private extraSlowManipulators: Map<HrmMod, BasicManipulator[]> = new Map();
+  // Manipulators that override the default mod-tap behavior.
+  // TODO: Implement this and replace the current setup.
+  // private smartManipulators: Map<Modifier, BasicManipulator[]> = new Map();
   private isLazy: boolean = false;
   private chosenHoldTapStrategy: HoldTapStrategy = 'permissive-hold'
   private isChordalHold: boolean = false;
@@ -170,7 +204,7 @@ export class HrmBuilder {
     return manipulators;
   }
 
-  private singleManipulatorLayer(hrmKey: HrmKeyParam, hrmMod: SideModifierAlias & ToKeyParam): Manipulator[] {
+  private singleManipulatorLayer(hrmKey: HrmKeyParam, hrmMod: SideModifierAlias): Manipulator[] {
     const side: Side = getSideOfMod(hrmMod);
 
     let permissiveManipulators: ((Manipulator | BasicManipulatorBuilder)[]) =
