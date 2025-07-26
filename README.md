@@ -10,7 +10,8 @@ for home row mods that works almost like on a QMK keyboard, i.e., it’s good.
 
 ### From source
 
-1. Clone the repository next to your Karabiner.ts project.
+1. Clone the repository next to your Karabiner.ts project:
+   `gh repo clone gregorias/karabiner.ts-greg-mods`.
 2. Install and build the repository with `npm install` and `npm run build`.
 3. Add the repository as a dependency to your K.ts project (`package.json`):
    `"karabiner.ts-greg-mods": "file:../karabiner.ts-greg-mods",`.
