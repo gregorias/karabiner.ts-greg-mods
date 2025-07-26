@@ -1,9 +1,11 @@
 import {
   ArrowKeyCode,
   arrowKeyCodes,
+  BasicManipulator,
   ControlOrSymbolKeyCode,
   controlOrSymbolKeyCodes,
   FromAndToKeyCode,
+  FromKeyCode,
   FromKeyParam,
   FunctionKeyCode,
   functionKeyCodes,
@@ -46,4 +48,17 @@ export function getSideOfMod(mod: SideModifierAlias): Side {
   } else {
     throw new Error(`Invalid side modifier: ${mod}`);
   }
+}
+
+/**
+ * Returns the from key code from a BasicManipulator or null if not found.
+ */
+export function getFromKeyCodeFromBasicManipulator(m: BasicManipulator): FromKeyCode | null {
+  if (!('key_code' in m.from)) {
+    return null;
+  }
+  if (typeof m.from.key_code === 'number') {
+    return null
+  }
+  return m.from.key_code;
 }

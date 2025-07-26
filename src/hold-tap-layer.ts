@@ -40,7 +40,7 @@ import {
   ToEvent,
   Condition,
 } from "karabiner.ts"
-import { BasicManipulatorBuilder, FromAndToKeyParam, isFromAndToKeyCode } from "./karabiner-extra";
+import { BasicManipulatorBuilder, FromAndToKeyParam, getFromKeyCodeFromBasicManipulator, isFromAndToKeyCode } from "./karabiner-extra";
 
 function applyConditionsToToEvent(e: ToEvent, ...conds: Array<Condition>): ToEvent {
   return {
@@ -216,7 +216,10 @@ export class HoldTapLayerBuilder {
       "permissiveHoldManipulator expects a BasicManipulator with a 'from' key code."
     );
 
-    const fromKeyCode = manipulator.from.key_code;
+    const fromKeyCode = getFromKeyCodeFromBasicManipulator(manipulator);
+    if (fromKeyCode === null) {
+      throw new Error(`A hold-tap 'manipulator' doesn't have a simple from key, but ${JSON.stringify(manipulator.from)}.`);
+    }
     if (!isFromAndToKeyCode(fromKeyCode)) {
       throw new Error("The 'from' key code must be a FromAndToKeyCode but is: " + fromKeyCode);
     }
