@@ -287,8 +287,7 @@ export class HrmBuilder {
             mtLayer.slowManipulators(sm);
             break;
           default:
-            const _: never = this.chosenHoldTapStrategy;
-            throw new Error(`Unknown hold tap strategy: ${_}`);
+            throw this.chosenHoldTapStrategy satisfies never;
         }
 
       }
@@ -308,8 +307,7 @@ export class HrmBuilder {
         mtLayer.slowKeys(smartKeys);
         break;
       default:
-        const _: never = this.chosenHoldTapStrategy;
-        throw new Error(`Unknown hold tap strategy: ${_}`);
+        throw this.chosenHoldTapStrategy satisfies never;
     }
 
     if (this.isChordalHold) {
@@ -326,8 +324,7 @@ export class HrmBuilder {
           mtLayer.slowKeys(slowKeys);
           break;
         default:
-          const _: never = this.chosenHoldTapStrategy;
-          throw new Error(`Unknown hold tap strategy: ${_}`);
+          throw this.chosenHoldTapStrategy satisfies never;
       }
     }
 
