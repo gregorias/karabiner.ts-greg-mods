@@ -60,6 +60,27 @@ export function getSideOfMod(mod: SideModifierAlias | Modifier): Side | null {
 }
 
 /**
+ * Returns whether a modifier is sided.
+ */
+export function isSidedMod(mod: SideModifierAlias | Modifier): boolean {
+  return getSideOfMod(mod) !== null;
+}
+
+/**
+ * Returns the unsided version of a modifier.
+ */
+export function getUnsidedMod(mod: Modifier): Modifier {
+  const s = mod as string;
+  if (s.startsWith('left_')) {
+    return s.slice(5) as Modifier;
+  }
+  if (s.startsWith('right_')) {
+    return s.slice(6) as Modifier;
+  }
+  return mod;
+}
+
+/**
  * Returns the from key code from a BasicManipulator or null if not found.
  */
 export function getFromKeyCodeFromBasicManipulator(m: BasicManipulator): FromKeyCode | null {

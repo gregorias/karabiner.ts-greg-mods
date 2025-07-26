@@ -10,6 +10,7 @@
 import {
   BasicManipulator,
   FromAndToKeyCode,
+  FromModifierParam,
   KeyAlias,
   LayerKeyParam,
   Manipulator,
@@ -25,6 +26,8 @@ import { modTapLayer } from "./mod-tap-layer";
 import {
   BasicManipulatorBuilder,
   getSideOfMod,
+  getUnsidedMod,
+  isSidedMod,
   Side,
 } from "./karabiner-extra";
 
@@ -84,8 +87,17 @@ class SmartModifierManipulatorMap {
       throw new Error(`Expected a single modifier, but got ${JSON.stringify(modifierParam)}.`);
     }
     let modifier = modifiers[0];
-    // TODO: Implement.
-    return [];
+
+    let manipulators = this.smartManipulators.get(modifier) ?? [];
+
+    if (isSidedMod(modifier)) {
+      const unsidedModifier = getUnsidedMod(modifier);
+      manipulators = manipulators.concat(
+        this.smartManipulators.get(unsidedModifier) ?? []
+      );
+    }
+
+    return manipulators;
   };
 
   public addSmartManipulator(modifierParam: ModifierParam, manipulator: BasicManipulator): this {
@@ -111,8 +123,8 @@ export class HrmBuilder {
     Map<HrmMod, (Manipulator | BasicManipulatorBuilder)[]> = new Map();
   private extraSlowManipulators: Map<HrmMod, BasicManipulator[]> = new Map();
   // Manipulators that override the default mod-tap behavior.
-  // TODO: Implement this and replace the current setup.
-  // private smartManipulators: Map<Modifier, BasicManipulator[]> = new Map();
+  private smartManipulatorMap: SmartModifierManipulatorMap =
+    new SmartModifierManipulatorMap();
   private isLazy: boolean = false;
   private chosenHoldTapStrategy: HoldTapStrategy = 'permissive-hold'
   private isChordalHold: boolean = false;
@@ -155,6 +167,11 @@ export class HrmBuilder {
     manipulators = manipulators.concat(this.singleManipulators());
 
     return manipulators;
+  }
+
+  public smartManipulator(mod: ModifierParam, manipulator: BasicManipulator): this {
+    this.smartManipulatorMap.addSmartManipulator(mod, manipulator);
+    return this;
   }
 
   public smartManipulators(hrmMod: HrmMod, ...newManipulators: Array<Manipulator | BasicManipulatorBuilder>): this {

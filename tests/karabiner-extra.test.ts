@@ -2,9 +2,12 @@ import {
   isFromAndToKeyCode,
   getSideOfMod,
   getFromKeyCodeFromBasicManipulator,
+  isSidedMod,
+  getUnsidedMod,
 } from '../src/karabiner-extra';
 import {
   BasicManipulator,
+  Modifier,
   SideModifierAlias,
 } from 'karabiner.ts';
 
@@ -39,6 +42,34 @@ describe('getSideOfMod', () => {
   it('should return null for non-sided modifiers', () => {
     expect(getSideOfMod('shift')).toBe(null);
     expect(getSideOfMod('any' as SideModifierAlias)).toBe(null);
+  });
+});
+
+describe('isSidedMod', () => {
+  it('should return true for sided modifiers', () => {
+    expect(isSidedMod('left_shift')).toBe(true);
+    expect(isSidedMod('right_control')).toBe(true);
+    expect(isSidedMod('<⇧')).toBe(true);
+    expect(isSidedMod('>⌃')).toBe(true);
+    expect(isSidedMod('l⌥')).toBe(true);
+    expect(isSidedMod('r⌥')).toBe(true);
+  });
+
+  it('should return false for non-sided modifiers', () => {
+    expect(isSidedMod('shift')).toBe(false);
+    expect(isSidedMod('any' as SideModifierAlias)).toBe(false);
+  });
+});
+
+describe('getUnsidedMod', () => {
+  it('should return the unsided version for sided modifiers', () => {
+    expect(getUnsidedMod('left_shift' as Modifier)).toBe('shift');
+    expect(getUnsidedMod('right_control' as Modifier)).toBe('control');
+  });
+
+  it('should return the same modifier for unsided modifiers', () => {
+    expect(getUnsidedMod('shift')).toBe('shift');
+    expect(getUnsidedMod('control')).toBe('control');
   });
 });
 
