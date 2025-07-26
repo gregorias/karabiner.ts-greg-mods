@@ -10,7 +10,7 @@
 import {
   BasicManipulator,
   FromAndToKeyCode,
-  FromModifierParam,
+  FromKeyCode,
   KeyAlias,
   LayerKeyParam,
   Manipulator,
@@ -20,13 +20,16 @@ import {
   SideModifierAlias,
   toKey,
   ToKeyParam,
+  getKeyWithAlias,
 } from "karabiner.ts";
 import { modTap } from "./mod-tap";
 import { modTapLayer } from "./mod-tap-layer";
 import {
   BasicManipulatorBuilder,
+  getFromKeyCodeFromBasicManipulator,
   getSideOfMod,
   getUnsidedMod,
+  isFromAndToKeyCode,
   isSidedMod,
   Side,
 } from "./karabiner-extra";
@@ -71,12 +74,35 @@ export declare type LeftModifierFlag = 'left' | 'l' | '<' | '‹';
 export type HrmKey = (FromAndToKeyCode | KeyAlias);
 export type HrmMod = SideModifierAlias & ToKeyParam;
 export type HrmKeyParam = (FromAndToKeyCode | KeyAlias) & LayerKeyParam;
-export type HrmKeyboardLayout = {
-  leftHandKeys: HrmKey[];
-  rightHandKeys: HrmKey[];
+
+export class HrmKeyboardLayout {
+  public readonly leftHandKeys: FromAndToKeyCode[];
+  public readonly rightHandKeys: FromAndToKeyCode[];
+
+  constructor(
+    leftHandKeys: Array<FromAndToKeyCode | KeyAlias>,
+    rightHandKeys: Array<FromAndToKeyCode | KeyAlias>
+  ) {
+    this.leftHandKeys = leftHandKeys.map(k => getKeyWithAlias<FromAndToKeyCode>(k));
+    this.rightHandKeys = rightHandKeys.map(k => getKeyWithAlias<FromAndToKeyCode>(k));
+  }
 }
 
 export type HoldTapStrategy = 'permissive-hold' | 'hold-on-other-key-press' | 'slow'
+
+/**
+ * Given a key and a keyboard layout, returns which side ('left' | 'right') the key is on,
+ * or null if the key is not found in either hand.
+ */
+export function getSideOfKey(key: FromAndToKeyCode, layout: HrmKeyboardLayout): Side | null {
+  if (layout.leftHandKeys.includes(key)) {
+    return 'left';
+  } else if (layout.rightHandKeys.includes(key)) {
+    return 'right';
+  } else {
+    return null;
+  }
+}
 
 class SmartModifierManipulatorMap {
   private smartManipulators: Map<Modifier, BasicManipulator[]> = new Map();
@@ -119,9 +145,6 @@ export class HrmBuilder {
   // A map of keys to their modifiers, e.g., a ⇒ ⌃, s ⇒ ⌥, d ⇒ ⇧.
   private readonly hrmKeys: Map<HrmKeyParam, HrmMod>;
   private readonly keyboardLayout: HrmKeyboardLayout;
-  private extraPermissiveManipulators:
-    Map<HrmMod, (Manipulator | BasicManipulatorBuilder)[]> = new Map();
-  private extraSlowManipulators: Map<HrmMod, BasicManipulator[]> = new Map();
   // Manipulators that override the default mod-tap behavior.
   private smartManipulatorMap: SmartModifierManipulatorMap =
     new SmartModifierManipulatorMap();
@@ -169,20 +192,26 @@ export class HrmBuilder {
     return manipulators;
   }
 
-  public smartManipulator(mod: ModifierParam, manipulator: BasicManipulator): this {
-    this.smartManipulatorMap.addSmartManipulator(mod, manipulator);
+  public smartManipulator(
+    mod: ModifierParam,
+    manipulator: BasicManipulator | BasicManipulatorBuilder
+  ): this {
+    if ('build' in manipulator) {
+      for (const m of manipulator.build())
+        this.smartManipulatorMap.addSmartManipulator(mod, m);
+    } else {
+      this.smartManipulatorMap.addSmartManipulator(mod, manipulator);
+    }
     return this;
   }
 
-  public smartManipulators(hrmMod: HrmMod, ...newManipulators: Array<Manipulator | BasicManipulatorBuilder>): this {
-    let existingManipulators = this.extraPermissiveManipulators.get(hrmMod) ?? [];
-    this.extraPermissiveManipulators.set(hrmMod, existingManipulators.concat(newManipulators));
-    return this;
-  }
-
-  public slowManipulators(hrmMod: HrmMod, ...newManipulators: BasicManipulator[]): this {
-    let existingManipulators = this.extraSlowManipulators.get(hrmMod) ?? [];
-    this.extraSlowManipulators.set(hrmMod, existingManipulators.concat(newManipulators));
+  public smartManipulators(
+    mod: ModifierParam,
+    ...manipulators: (BasicManipulator | BasicManipulatorBuilder)[]
+  ): this {
+    for (const manipulator of manipulators) {
+      this.smartManipulator(mod, manipulator);
+    }
     return this;
   }
 
@@ -227,20 +256,43 @@ export class HrmBuilder {
       throw new Error(`Expected a sided modifier, but got ${JSON.stringify(hrmMod)}.`);
     }
 
-    let permissiveManipulators: ((Manipulator | BasicManipulatorBuilder)[]) =
-      this.extraPermissiveManipulators.get(hrmMod) ?? [];
-    let slowManipulators: BasicManipulator[] =
-      this.extraSlowManipulators.get(hrmMod) ?? [];
+    let smartManipulators: BasicManipulator[] = this.smartManipulatorMap.getSmartManipulators(hrmMod);
 
-    // Making the key lazy works for my workflow. I never want just to have to press
-    // the modifier standalone. Also, I sometimes remap combos, e.g.,
-    // r⌥+r to ⏎, and having r⌥ show up as a press, ruins HRM.
-    let mtLayer = modTapLayer(hrmKey, hrmMod);
-    mtLayer
-      .lazy(this.isLazy)
-      // TODO: Add permissiveHoldManipulators
-      .holdOnOtherKeyPressManipulators(permissiveManipulators)
-      .slowManipulators(...slowManipulators)
+    let mtLayer = modTapLayer(hrmKey, hrmMod).lazy(this.isLazy)
+
+    for (const sm of smartManipulators) {
+      const smFrom = getFromKeyCodeFromBasicManipulator(sm);
+      if (smFrom === null) {
+        throw new Error(`Expected a from key code in a smart manipulator but got ${JSON.stringify(sm)}.`);
+      }
+      if (!isFromAndToKeyCode(smFrom)) {
+        throw new Error(`Expected a from and to key code in a smart manipulator but got ${JSON.stringify(smFrom)}.`);
+      }
+      const smSide = getSideOfKey(smFrom, this.keyboardLayout);
+      if (smSide === null) {
+        throw new Error(`Could not determine the side of the smart manipulator key, ${JSON.stringify(smFrom)}.`);
+      }
+
+      if (this.isChordalHold && smSide === side) {
+        mtLayer.slowManipulators(sm);
+      } else {
+        switch (this.chosenHoldTapStrategy) {
+          case 'permissive-hold':
+            mtLayer.permissiveHoldManipulators(sm);
+            break;
+          case 'hold-on-other-key-press':
+            mtLayer.holdOnOtherKeyPressManipulator(sm);
+            break;
+          case 'slow':
+            mtLayer.slowManipulators(sm);
+            break;
+          default:
+            const _: never = this.chosenHoldTapStrategy;
+            throw new Error(`Unknown hold tap strategy: ${_}`);
+        }
+
+      }
+    }
 
     let smartKeys = side === 'left' ? this.keyboardLayout.rightHandKeys : this.keyboardLayout.leftHandKeys;
     let slowKeys = side === 'left' ? this.keyboardLayout.leftHandKeys : this.keyboardLayout.rightHandKeys;
