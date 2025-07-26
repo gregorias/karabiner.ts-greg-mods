@@ -21,6 +21,7 @@ import {
   NumberKeyCode,
   numberKeyCodes,
   SideModifierAlias,
+  Modifier,
   ToKeyParam,
 } from 'karabiner.ts';
 
@@ -40,13 +41,21 @@ export function isFromAndToKeyCode(key: string | number): key is FromAndToKeyCod
 
 export type Side = 'left' | 'right';
 
-export function getSideOfMod(mod: SideModifierAlias): Side {
+/**
+ * Returns the side of a sided modifier alias or Modifier or null if not sided.
+ *
+ * Accepts SideModifierAlias (e.g., 'left_shift', '>shift')
+ * or canonical Modifier (e.g., 'shift').
+ */
+export function getSideOfMod(mod: SideModifierAlias | Modifier): Side | null {
+  if (typeof mod !== 'string') return null;
   if (mod.startsWith('left') || mod.startsWith('l') || mod.startsWith('<') || mod.startsWith('‹')) {
     return 'left';
   } else if (mod.startsWith('right') || mod.startsWith('r') || mod.startsWith('>') || mod.startsWith('›')) {
     return 'right';
   } else {
-    throw new Error(`Invalid side modifier: ${mod}`);
+    // Not a sided modifier
+    return null;
   }
 }
 

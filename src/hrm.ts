@@ -205,7 +205,10 @@ export class HrmBuilder {
   }
 
   private singleManipulatorLayer(hrmKey: HrmKeyParam, hrmMod: SideModifierAlias): Manipulator[] {
-    const side: Side = getSideOfMod(hrmMod);
+    const side: Side | null = getSideOfMod(hrmMod);
+    if (side === null) {
+      throw new Error(`Expected a sided modifier, but got ${JSON.stringify(hrmMod)}.`);
+    }
 
     let permissiveManipulators: ((Manipulator | BasicManipulatorBuilder)[]) =
       this.extraPermissiveManipulators.get(hrmMod) ?? [];
