@@ -1,0 +1,22 @@
+{
+  "name": "karabiner.ts-greg-mods",
+  "version": "0.1.0",
+  "description": "Custom modifiers for karabiner.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "karabiner.ts": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5",
+    "karabiner.ts": "latest"
+  },
+  "files": [
+    "dist"
+  ]
+}
