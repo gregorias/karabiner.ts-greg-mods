@@ -26,6 +26,7 @@ import { modTap } from "./mod-tap";
 import { modTapLayer } from "./mod-tap-layer";
 import {
   BasicManipulatorBuilder,
+  FromAndToKeyParam,
   getFromKeyCodeFromBasicManipulator,
   getSideOfMod,
   getUnsidedMod,
@@ -105,39 +106,34 @@ export function getSideOfKey(key: FromAndToKeyCode, layout: HrmKeyboardLayout): 
   }
 }
 
-class SmartModifierManipulatorMap {
-  private smartManipulators: Map<Modifier, BasicManipulator[]> = new Map();
+class SmartModifierMap<T> {
+  private elems: Map<Modifier, T[]> = new Map();
 
-  public getSmartManipulators(modifierParam: ModifierParam): BasicManipulator[] {
+  public get(modifierParam: ModifierParam): T[] {
     let modifiers = parseModifierParam(modifierParam);
     if (!modifiers || modifiers.length != 1) {
       throw new Error(`Expected a single modifier, but got ${JSON.stringify(modifierParam)}.`);
     }
     let modifier = modifiers[0];
 
-    let manipulators = this.smartManipulators.get(modifier) ?? [];
+    let elems = this.elems.get(modifier) ?? [];
 
     if (isSidedMod(modifier)) {
       const unsidedModifier = getUnsidedMod(modifier);
-      manipulators = manipulators.concat(
-        this.smartManipulators.get(unsidedModifier) ?? []
-      );
+      elems = elems.concat(this.elems.get(unsidedModifier) ?? []);
     }
 
-    return manipulators;
+    return elems;
   };
 
-  public addSmartManipulator(modifierParam: ModifierParam, manipulator: BasicManipulator): this {
+  public add(modifierParam: ModifierParam, elem: T): this {
     let modifiers = parseModifierParam(modifierParam);
     if (!modifiers || modifiers.length != 1) {
       throw new Error(`Expected a single modifier, but got ${JSON.stringify(modifierParam)}.`);
     }
     let modifier = modifiers[0];
 
-    this.smartManipulators.set(
-      modifier,
-      (this.smartManipulators.get(modifier) ?? []).concat(manipulator)
-    );
+    this.elems.set(modifier, (this.elems.get(modifier) ?? []).concat([elem]));
     return this;
   }
 }
@@ -147,8 +143,8 @@ export class HrmBuilder {
   private readonly hrmKeys: Map<HrmKeyParam, HrmMod>;
   private readonly keyboardLayout: HrmKeyboardLayout;
   // Manipulators that override the default mod-tap behavior.
-  private smartManipulatorMap: SmartModifierManipulatorMap =
-    new SmartModifierManipulatorMap();
+  private smartManipulatorMap: SmartModifierMap<BasicManipulator> = new SmartModifierMap();
+  private smartKeyOverrideMap: SmartModifierMap<[FromAndToKeyCode, HoldTapStrategy]> = new SmartModifierMap();
   private isLazy: boolean = false;
   private chosenHoldTapStrategy: HoldTapStrategy = 'permissive-hold'
   private isChordalHold: boolean = false;
@@ -199,9 +195,9 @@ export class HrmBuilder {
   ): this {
     if ('build' in manipulator) {
       for (const m of manipulator.build())
-        this.smartManipulatorMap.addSmartManipulator(mod, m);
+        this.smartManipulatorMap.add(mod, m);
     } else {
-      this.smartManipulatorMap.addSmartManipulator(mod, manipulator);
+      this.smartManipulatorMap.add(mod, manipulator);
     }
     return this;
   }
@@ -212,6 +208,20 @@ export class HrmBuilder {
   ): this {
     for (const manipulator of manipulators) {
       this.smartManipulator(mod, manipulator);
+    }
+    return this;
+  }
+
+  /**
+   * Adds some keys that override the default hold-tap strategy.
+   */
+  public keys(
+    mod: ModifierParam,
+    keys: FromAndToKeyParam[],
+    strategy: HoldTapStrategy
+  ): this {
+    for (const key of keys) {
+      this.smartKeyOverrideMap.add(mod, [getKeyWithAlias<FromAndToKeyCode>(key), strategy]);
     }
     return this;
   }
@@ -262,7 +272,7 @@ export class HrmBuilder {
       throw new Error(`Expected a sided modifier, but got ${JSON.stringify(hrmMod)}.`);
     }
 
-    let smartManipulators: BasicManipulator[] = this.smartManipulatorMap.getSmartManipulators(hrmMod);
+    let smartManipulators: BasicManipulator[] = this.smartManipulatorMap.get(hrmMod);
 
     let mtLayer = modTapLayer(hrmKey, hrmMod).lazy(this.isLazy)
 
@@ -295,7 +305,24 @@ export class HrmBuilder {
           default:
             throw this.chosenHoldTapStrategy satisfies never;
         }
+      }
+    }
 
+    let keyOverrides: [FromAndToKeyCode, HoldTapStrategy][] = this.smartKeyOverrideMap.get(hrmMod);
+
+    for (const [key, strategy] of keyOverrides) {
+      switch (strategy) {
+        case 'permissive-hold':
+          mtLayer.permissiveHoldKey(key);
+          break;
+        case 'hold-on-other-key-press':
+          mtLayer.holdOnOtherKeyPressKeys([key]);
+          break;
+        case 'slow':
+          mtLayer.slowKeys([key]);
+          break;
+        default:
+          throw strategy satisfies never;
       }
     }
 
