@@ -64,9 +64,18 @@ let symbolsBisLayer: Rule = holdTapLayer("␣")
 You can define sub-layers like so:
 
 ```typescript
-  .permissiveHoldManipulators(
+  // Trigger the sub-layer on press and hold.
+  .holdOnOtherKeyPressManipulators([
     // Necessary: https://github.com/evan-liu/karabiner.ts/issues/171.
     map("l⇧").to(toSetVar("shift-mode", 1)).toAfterKeyUp(toSetVar("shift-mode", 0)),
+    map("k")
+      .to(toSetVar("shift-mode", 1))
+      .toAfterKeyUp(toSetVar("shift-mode", 0)),
+      // If we just rolled over the keys, replay them.
+      .toIfAlone("␣")
+      .toIfAlone("k")
+  ])
+  .permissiveHoldManipulators(
     ...withCondition(ifVar("shift-mode"))([
       // …
       map("m").to("!"),
@@ -112,8 +121,8 @@ const simpleHrm: BasicManipulator[] = [
   ...modTap().from(["a", "s"]).modifiers(toKey("l⌃", "l⌘")).build(),
   ...modTap().from(["s", "a"]).modifiers(toKey("l⌃", "l⌘")).build(),
   ...modTap().from("a").modifiers(toKey("l⌃")).build(),
-  ...modTap().from("s").modifiers(toKey("l⌘")).build(),
-]
+  ...modTap().from("s").modifiers(toKey("l⌘")).build()
+];
 ```
 
 ### Home row mods
