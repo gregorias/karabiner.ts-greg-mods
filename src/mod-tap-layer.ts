@@ -12,17 +12,26 @@ import {
   SideModifierAlias,
   KeyAlias,
   Rule,
+  PointingButton,
+  Modifier,
+  parseModifierParam,
 } from "karabiner.ts"
 import { holdTapLayer, HoldTapLayerBuilder } from "./hold-tap-layer";
-import { BasicManipulatorBuilder, FromAndToKeyParam } from "./karabiner-extra";
+import { BasicManipulatorBuilder, FromAndToKeyParam, isPointingButton } from "./karabiner-extra";
 
 export class ModTapLayerBuilder {
-  private mod: SideModifierAlias;
+  private mod: Modifier;
+  private modAlias: SideModifierAlias;
   private hold_tap_layer_builder: HoldTapLayerBuilder;
   private isLazy: boolean = false;
 
   constructor(key: LayerKeyParam, mod: SideModifierAlias) {
-    this.mod = mod;
+    const mods = parseModifierParam(mod);
+    if (!mods || mods.length !== 1) {
+      throw new Error(`Mod-tap layer requires exactly one modifier got: ${mod}.`);
+    }
+    this.mod = mods[0];
+    this.modAlias = mod;
     this.hold_tap_layer_builder = holdTapLayer(key);
   }
 
@@ -59,7 +68,7 @@ export class ModTapLayerBuilder {
     // `.toIfHeldDown(mod)` needs to be last to ensure that Karabiner holds the modifier.
     // `toSetVar` would interrupt the hold action.
     //
-    return this.hold_tap_layer_builder.onHold(this.mod, [], { lazy: this.isLazy })
+    return this.hold_tap_layer_builder.onHold(this.modAlias, [], { lazy: this.isLazy })
       .build();
   }
 
@@ -78,15 +87,21 @@ export class ModTapLayerBuilder {
    *
    * HOOKP keys immediately send the key with the layer's modifier.
    */
-  public holdOnOtherKeyPressKeys(keys: Array<FromAndToKeyCode | KeyAlias>): this {
+  public holdOnOtherKeyPressKeys(keys: Array<FromAndToKeyCode | KeyAlias | PointingButton>): this {
     for (const key of keys) {
-      this.holdOnOtherKeyPressManipulator(map(key).to(key, this.mod));
+      if (isPointingButton(key)) {
+        this.hold_tap_layer_builder.holdOnOtherKeyPressManipulator(
+          map({ pointing_button: key }).to(
+            { pointing_button: key, modifiers: [this.mod] },));
+      } else {
+        this.holdOnOtherKeyPressManipulator(map(key).to(key, this.mod));
+      }
     }
     return this
   }
 
   public permissiveHoldManipulators(
-    ...manipulators: (BasicManipulator  | BasicManipulatorBuilder)[]
+    ...manipulators: (BasicManipulator | BasicManipulatorBuilder)[]
   ): this {
     this.hold_tap_layer_builder.permissiveHoldManipulators(...manipulators);
     return this
@@ -95,13 +110,19 @@ export class ModTapLayerBuilder {
   /**
    * Adds a permissive hold key to the layer.
    */
-  public permissiveHoldKey(from: FromAndToKeyParam): this {
-    this.hold_tap_layer_builder.permissiveHoldManipulator(
-      map(from).to(from, this.mod));
+  public permissiveHoldKey(from: FromAndToKeyParam | PointingButton): this {
+    if (isPointingButton(from)) {
+      this.hold_tap_layer_builder.permissiveHoldManipulator(
+        map({ pointing_button: from }).to(
+          { pointing_button: from, modifiers: [this.mod] },));
+    } else {
+      this.hold_tap_layer_builder.permissiveHoldManipulator(
+        map(from).to(from, this.mod));
+    }
     return this
   }
 
-  public permissiveHoldKeys(...keys: Array<FromAndToKeyParam>): this {
+  public permissiveHoldKeys(...keys: Array<FromAndToKeyParam | PointingButton>): this {
     for (const key of keys) {
       this.permissiveHoldKey(key);
     }
@@ -116,9 +137,15 @@ export class ModTapLayerBuilder {
    * Registering a slow key is necessary, because the if-held-down event can be
    * interrupted, e.g., by a permissive-hold key.
    */
-  public slowKeys(keys: Array<FromAndToKeyParam>): this {
+  public slowKeys(keys: Array<FromAndToKeyParam | PointingButton>): this {
     for (const key of keys) {
-      this.hold_tap_layer_builder.slowManipulators(...map(key).to(key, this.mod).build());
+      if (isPointingButton(key)) {
+        this.hold_tap_layer_builder.slowManipulator(
+          map({ pointing_button: key }).to(
+            { pointing_button: key, modifiers: [this.mod] },));
+      } else {
+        this.hold_tap_layer_builder.slowManipulators(...map(key).to(key, this.mod).build());
+      }
     }
     return this
   }

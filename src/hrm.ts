@@ -21,6 +21,7 @@ import {
   toKey,
   ToKeyParam,
   getKeyWithAlias,
+  PointingButton,
 } from "karabiner.ts";
 import { modTap } from "./mod-tap";
 import { modTapLayer } from "./mod-tap-layer";
@@ -78,15 +79,22 @@ export type HrmMod = SideModifierAlias & ToKeyParam;
 export type HrmKeyParam = (FromAndToKeyCode | KeyAlias) & LayerKeyParam;
 
 export class HrmKeyboardLayout {
-  public readonly leftHandKeys: FromAndToKeyCode[];
-  public readonly rightHandKeys: FromAndToKeyCode[];
+  public readonly leftHandKeys: (FromAndToKeyCode | PointingButton)[];
+  public readonly rightHandKeys: (FromAndToKeyCode | PointingButton)[];
 
   constructor(
-    leftHandKeys: Array<FromAndToKeyCode | KeyAlias>,
-    rightHandKeys: Array<FromAndToKeyCode | KeyAlias>
+    leftHandKeys: Array<FromAndToKeyCode | KeyAlias | PointingButton>,
+    rightHandKeys: Array<FromAndToKeyCode | KeyAlias | PointingButton>
   ) {
-    this.leftHandKeys = leftHandKeys.map(k => getKeyWithAlias<FromAndToKeyCode>(k));
-    this.rightHandKeys = rightHandKeys.map(k => getKeyWithAlias<FromAndToKeyCode>(k));
+    this.leftHandKeys = leftHandKeys.map(HrmKeyboardLayout.parseKey);
+    this.rightHandKeys = rightHandKeys.map(HrmKeyboardLayout.parseKey);
+  }
+
+  private static parseKey(key: FromAndToKeyCode | KeyAlias | PointingButton):
+  FromAndToKeyCode | PointingButton {
+    if (key.startsWith("button"))
+      return key as PointingButton;
+    return getKeyWithAlias<FromAndToKeyCode>(key as FromAndToKeyCode | KeyAlias);
   }
 }
 
