@@ -10,13 +10,13 @@
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
-    "karabiner.ts": "latest"
+    "karabiner.ts": "^1.32.0"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/node": "^22",
     "jest": "^30.0.5",
-    "karabiner.ts": "latest",
+    "karabiner.ts": "^1.32.0",
     "ts-jest": "^29.4.0",
     "typescript": "^5"
   },

@@ -44,11 +44,11 @@ import {
 } from "karabiner.ts"
 import { BasicManipulatorBuilder, FromAndToKeyParam, getFromKeyCodeFromBasicManipulator, isFromAndToKeyCode } from "./karabiner-extra";
 
-function applyConditionsToToEvent(e: ToEvent, ...conds: Array<Condition>): ToEvent {
+function applyConditionsToToEvent(e: ToEvent, ...conds: Condition[]): ToEvent {
   return {
     ...e,
     conditions: conds,
-  } as unknown as ToEvent;
+  };
 }
 
 function applyConditionToToEvents(m: BasicManipulator, cond: Condition) {
