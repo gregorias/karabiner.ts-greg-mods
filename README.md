@@ -118,11 +118,11 @@ const simpleHrm: BasicManipulator[] = [
 
 ### Home row mods
 
-`hrm` is turn-key solution for configuring home row mods that utilizes
-the features of the hold-tap layer. It provides quite snappy experience as
-it is responsive with permissive-hold and chordal-hold strategies
-(both optional) while also not losing keys during accidental roll overs
-(mostly).
+`hrm` is a turn-key solution for configuring home row mods that utilizes
+the features of [the hold-tap layer](#hold-tap-layer).
+It provides quite snappy experience as it is responsive with permissive-hold
+and chordal-hold strategies (both optional) while also not losing keys during
+accidental roll overs (mostly).
 
 #### Example HRM configuration
 
