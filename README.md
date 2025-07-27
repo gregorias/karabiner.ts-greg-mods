@@ -4,7 +4,8 @@ This TS package contains [Karabiner.ts][karabiner.ts] recipes for QMK-like
 layers (namely: hold-tap and mod-tap) with powerful QMK features:
 [permissive-hold][permissive-hold], chordal hold, and hold on key press.
 This package builds upon these layers to provide the first turn-key solution
-for home row mods that works almost like on a QMK keyboard, i.e., it’s good.
+for [home row mods](#home-row-mods) that works almost like on a QMK keyboard,
+i.e., it’s good.
 
 ## 📦 Installation
 
@@ -31,6 +32,8 @@ permissive-hold and the slow-mode (wait for the tapping term to elapse).
 If you don’t activate the hold, e.g., you quickly roll over two keys during
 writing, this layer replays the layer and the other key.
 With this layer, you don’t lose your keystrokes during simple roll overs.
+
+#### Example hold-tap configuration
 
 ```typescript
 // A symbols layer activated with ␣.
@@ -83,12 +86,45 @@ If you don’t want to lose the layer key during writing,
 you need to define any keys it might roll over with either as a manipulator or
 as an echo key. I just provide a list of all keys on my keyboard as echo keys.
 
+### Mod-tap
+
+A `mod-tap` key is a dual-function key that acts as a normal key when tapped
+but becomes a modifier when held down.
+The `modTap` mod turns a key into a mod-tap key.
+
+The `mod-tap` builder supports two main modes:
+
+- **Non-permissive**: The modifier is only activated after the `tappingTerm`
+  has elapsed. This is safer against accidental triggers during fast typing
+  but can feel less responsive.
+- **Permissive**: The modifier is activated as soon as another key is
+  pressed, making it feel more immediate. However, this can sometimes lead to
+  unintended modifier activation during quick key rolls.
+
+This recipe lets you set up bare-bones HRM with modifier chaining.
+It’s further described
+[in my blog post](https://gregorias.github.io/posts/home-row-mods-karabiner-elements/).
+
+#### Example mod-tap configuration
+
+```typescript
+const simpleHrm: BasicManipulator[] = [
+  ...modTap().from(["a", "s"]).modifiers(toKey("l⌃", "l⌘")).build(),
+  ...modTap().from(["s", "a"]).modifiers(toKey("l⌃", "l⌘")).build(),
+  ...modTap().from("a").modifiers(toKey("l⌃")).build(),
+  ...modTap().from("s").modifiers(toKey("l⌘")).build(),
+]
+```
+
 ### Home row mods
 
 `hrm` is turn-key solution for configuring home row mods that utilizes
 the features of the hold-tap layer. It provides quite snappy experience as
-it provides responsiveness with permissive-hold and chordal-hold strategies
-(both optional) while also not losing keys during accidental roll overs (mostly).
+it is responsive with permissive-hold and chordal-hold strategies
+(both optional) while also not losing keys during accidental roll overs
+(mostly).
+
+#### Example HRM configuration
 
 ```typescript
 const leftHandKeys = ["q" /*…*/, , "b"];

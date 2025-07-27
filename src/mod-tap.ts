@@ -1,9 +1,18 @@
-// Mod-tap is an implementation of mod-tap behavior.
+// Mod-tap turns a key in a dual-function mod-tap one.
 //
 // A mod-tap key can work in two modes:
 //
-// - Non-permissive requires waiting for the tapping term to pass before activating the modifier.
+// - Non-permissive requires waiting for the tapping term to pass before
+//   activating the modifier.
 // - Permissive activates the modifier as soon as another key is pressed.
+//
+// ## Flaws & limitations
+//
+// Mod-tap non-permissive keys require waiting for the tapping term to be over. This is
+// cumbersome as the tapping term needs to be large enough to avoid accidental
+// activation (above 100 ms).
+//
+// Mod-tap permissive keys spuriously activate during roll overs.
 import {
   BasicManipulator,
   FromEvent,
@@ -23,9 +32,81 @@ export class ModTapBuilder {
   private originalEvents: Array<ToEvent> = [];
   private isPermissive: boolean = false;
   private mods!: ToEvent;
-  private timeout?: number;
+  private tappingTermMs?: number;
 
   constructor() {
+  }
+
+  public build(): BasicManipulator[] {
+    let cancelledAction = this.isPermissive ? this.mods : this.originalEvents;
+    let m = map(this.fromEvent)
+      .toIfAlone(this.copyAndAddHaltToFirstToEvent(this.originalEvents))
+      .toIfHeldDown(this.mods)
+      .toDelayedAction([], cancelledAction)
+
+    if (this.tappingTermMs !== undefined) {
+      m.parameters({
+        "basic.to_if_held_down_threshold_milliseconds": this.tappingTermMs,
+      })
+    }
+
+    return m.build();
+  }
+
+  public from(keyCodeAlias: FromAndToKeyCode | KeyAlias | Array<FromAndToKeyCode | KeyAlias>,
+    mandatoryModifiers?: FromModifierParam & ModifierParam,
+    optionalModifiers?: FromModifierParam): this {
+    if (Array.isArray(keyCodeAlias)) {
+      const keyCodes = keyCodeAlias.map(
+        function(keyCodeAlias) {
+          return { key_code: getKeyWithAlias<FromAndToKeyCode>(keyCodeAlias) };
+        })
+      this.fromEvent = {
+        simultaneous: keyCodes,
+        simultaneous_options: { key_down_order: "strict" },
+        modifiers: parseFromModifierParams(mandatoryModifiers, optionalModifiers)
+      };
+      this.originalEvents = keyCodes;
+    } else {
+      const keyCode = getKeyWithAlias<FromAndToKeyCode>(keyCodeAlias)
+      this.fromEvent = {
+        key_code: keyCode,
+        modifiers: parseFromModifierParams(mandatoryModifiers, optionalModifiers),
+      };
+      this.originalEvents = [{
+        key_code: keyCode,
+        modifiers: parseModifierParam(mandatoryModifiers),
+      }];
+    }
+    return this;
+  }
+
+  /**
+   * Sets the mod-tap key to be permissive or non-permissive.
+   *
+   * A permissive mod-tap key activates the modifier as soon as another key is pressed.
+   * A non-permissive mod-tap key requires the tapping term to pass before activating.
+   */
+  public permissive(val: boolean): this {
+    this.isPermissive = val
+    return this
+  }
+
+  public modifiers(modifiers: ToEvent): this {
+    this.mods = modifiers;
+    this.mods.halt = true;
+    return this;
+  }
+
+  /**
+   * Sets the tapping term in milliseconds.
+   *
+   * The tapping term is the time in milliseconds that the key must be held
+   * down in order to be fully active for non-permissive mod-tap keys.
+   */
+  public tappingTerm(tappingTermMs: number): this {
+    this.tappingTermMs = tappingTermMs;
+    return this;
   }
 
   private copyAndAddHaltToFirstToEvent(toEvents: Array<ToEvent>): Array<ToEvent> {
@@ -40,55 +121,6 @@ export class ModTapBuilder {
       },
       ...toEvents.slice(1),
     ];
-  }
-
-  public build(): Array<BasicManipulator> {
-    let cancelledAction = this.isPermissive ? this.mods : this.originalEvents;
-    return map(this.fromEvent)
-      .toIfAlone(this.copyAndAddHaltToFirstToEvent(this.originalEvents))
-      .toIfHeldDown(this.mods)
-      .toDelayedAction([], cancelledAction)
-      .parameters({
-        "basic.to_if_held_down_threshold_milliseconds": this.timeout,
-      })
-      .build();
-  }
-
-  public from(keyCodeAlias: FromAndToKeyCode | KeyAlias | Array<FromAndToKeyCode | KeyAlias>,
-    mandatoryModifiers?: FromModifierParam & ModifierParam,
-    optionalModifiers?: FromModifierParam): this {
-    if (Array.isArray(keyCodeAlias)) {
-      const keyCodes = keyCodeAlias.map(
-        function(keyCodeAlias) {
-          return { key_code: getKeyWithAlias<FromAndToKeyCode>(keyCodeAlias) };
-        })
-      this.fromEvent = {
-        simultaneous: keyCodes,
-        simultaneous_options: { key_down_order: "strict" },
-        modifiers: parseFromModifierParams(mandatoryModifiers, optionalModifiers) };
-      this.originalEvents = keyCodes;
-    } else {
-      const keyCode = getKeyWithAlias<FromAndToKeyCode>(keyCodeAlias)
-      this.fromEvent = { key_code: keyCode, modifiers: parseFromModifierParams(mandatoryModifiers, optionalModifiers) };
-      this.originalEvents = [{ key_code: keyCode, modifiers: parseModifierParam(mandatoryModifiers) }];
-    }
-    return this;
-  }
-
-  public permissive(val: boolean): this {
-    this.isPermissive = val
-    return this
-  }
-
-  public modifiers(modifiers: ToEvent): this {
-    this.mods = modifiers;
-    this.mods.halt = true;
-    return this;
-  }
-
-  public heldTimeout(timeout: number): this {
-    this.timeout = timeout;
-    return this;
   }
 }
 
