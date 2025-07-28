@@ -16,7 +16,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^22",
     "jest": "^30.0.5",
-    "karabiner.ts": "^1.32.0",
+    "karabiner.ts": "^1.33.0",
     "ts-jest": "^29.4.0",
     "typescript": "^5"
   },
