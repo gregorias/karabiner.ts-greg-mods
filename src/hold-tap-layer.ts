@@ -222,29 +222,19 @@ export class HoldTapLayerBuilder {
     }
 
     assert(
-      "from" in manipulator &&
-      ("key_code" in manipulator.from || "pointing_button" in manipulator.from),
-      "permissiveHoldManipulator expects a BasicManipulator with a 'from' key code or pointing button."
+      "from" in manipulator && "key_code" in manipulator.from,
+      "permissiveHoldManipulator expects a BasicManipulator with a 'from' key code."
     );
 
-    let replayFrom: any;
-    if ("key_code" in manipulator.from) {
-      const fromKeyCode = getFromKeyCodeFromBasicManipulator(manipulator);
-      if (fromKeyCode === null) {
-        throw new Error(`A hold-tap 'manipulator' doesn't have a simple from key, but ${JSON.stringify(manipulator.from)}.`);
-      }
-      if (!isFromAndToKeyCode(fromKeyCode)) {
-        throw new Error("The 'from' key code must be a FromAndToKeyCode but is: " + fromKeyCode);
-      }
-      if (!isFromAndToKeyCode(this.key)) {
-        throw new Error("The layer key must be a FromAndToKeyCode but is: " + this.key);
-      }
-      replayFrom = { key_code: fromKeyCode } as ToEvent;
-    } else if ("pointing_button" in manipulator.from) {
-      replayFrom = {
-        pointing_button: manipulator.from.pointing_button,
-      };
-
+    const fromKeyCode = getFromKeyCodeFromBasicManipulator(manipulator);
+    if (fromKeyCode === null) {
+      throw new Error(`A hold-tap 'manipulator' doesn't have a simple from key, but ${JSON.stringify(manipulator.from)}.`);
+    }
+    if (!isFromAndToKeyCode(fromKeyCode)) {
+      throw new Error("The 'from' key code must be a FromAndToKeyCode but is: " + fromKeyCode);
+    }
+    if (!isFromAndToKeyCode(this.key)) {
+      throw new Error("The layer key must be a FromAndToKeyCode but is: " + this.key);
     }
 
     // Encode the permissive hold logic inside a manipulator.
@@ -264,11 +254,11 @@ export class HoldTapLayerBuilder {
       {
         conditions: [unlessLayerVariable],
         key_code: this.key,
-      },
+      } as unknown as ToEvent,
       {
         conditions: [unlessLayerVariable],
-        ...replayFrom,
-      },
+        key_code: fromKeyCode,
+      } as unknown as ToEvent,
       // Unset the start variable. We have triggered the hold action, so we are
       // in.
       toSetVar(this.startVariable, 0),

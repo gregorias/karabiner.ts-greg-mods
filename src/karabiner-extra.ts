@@ -24,7 +24,6 @@ import {
   Modifier,
   ToKeyParam,
   getKeyWithAlias,
-  PointingButton,
 } from 'karabiner.ts';
 
 export type FromAndToKeyParam = FromKeyParam & ToKeyParam;
@@ -39,10 +38,6 @@ export function isFromAndToKeyCode(key: string | number): key is FromAndToKeyCod
     functionKeyCodes.includes(key as FunctionKeyCode) ||
     keypadKeyCodes.includes(key as KeypadKeyCode) ||
     internationalKeyCodes.includes(key as InternationalKeyCode);
-}
-
-export function isPointingButton(key: string | number): key is PointingButton {
-  return typeof key === 'string' && key.startsWith('button');
 }
 
 export type Side = 'left' | 'right';
