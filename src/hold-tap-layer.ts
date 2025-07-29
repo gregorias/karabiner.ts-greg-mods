@@ -314,7 +314,8 @@ export class HoldTapLayerBuilder {
 
     assert(
       "from" in manipulator && "key_code" in manipulator.from,
-      "slowManipulator expects a BasicManipulator with a 'from' key code."
+      "slowManipulator expects a BasicManipulator with a 'from' key code," +
+      ` but got ${JSON.stringify(manipulator)}.`
     );
 
     const fromKeyCode = manipulator.from.key_code;

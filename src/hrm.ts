@@ -10,7 +10,6 @@
 import {
   BasicManipulator,
   FromAndToKeyCode,
-  FromKeyCode,
   KeyAlias,
   LayerKeyParam,
   Manipulator,
@@ -22,6 +21,8 @@ import {
   ToKeyParam,
   getKeyWithAlias,
   PointingButton,
+  toPointingButton,
+  mapPointingButton,
 } from "karabiner.ts";
 import { modTap } from "./mod-tap";
 import { modTapLayer } from "./mod-tap-layer";
@@ -370,6 +371,10 @@ export class HrmBuilder {
           throw this.chosenHoldTapStrategy satisfies never;
       }
     }
+    // Let the primary mouse button benefit from modifiers.
+    mtLayer.holdOnOtherKeyPressManipulator(
+      mapPointingButton("button1").to(toPointingButton("button1", hrmMod))
+    )
 
     return mtLayer.build().manipulators;
   }
