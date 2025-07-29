@@ -29,13 +29,13 @@ describe('modTap', () => {
     const manipulator = manipulators[0] as any;
 
     expect(manipulator.from).toEqual({ key_code: 'a' });
-    expect(manipulator.to_if_alone).toEqual([{ key_code: 'a', halt: true }]);
-    expect(manipulator.to_if_held_down).toEqual([{ key_code: 'left_shift', halt: true }]);
-    expect(manipulator.to_delayed_action.to_if_invoked).toEqual([]);
-    expect(manipulator.to_delayed_action.to_if_canceled).toEqual([{
+    expect(manipulator.to).toEqual([{
       key_code: 'left_shift',
-      halt: true,
+      lazy: true,
     }]);
+    expect(manipulator.to_if_alone).toEqual([{ key_code: 'a', halt: true }]);
+    expect(manipulator.to_if_held_down).toBeUndefined()
+    expect(manipulator.to_delayed_action).toBeUndefined()
   });
 
   it('should set a tapping term', () => {

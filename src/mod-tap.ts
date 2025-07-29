@@ -38,11 +38,21 @@ export class ModTapBuilder {
   }
 
   public build(): BasicManipulator[] {
-    let cancelledAction = this.isPermissive ? this.mods : this.originalEvents;
     let m = map(this.fromEvent)
       .toIfAlone(this.copyAndAddHaltToFirstToEvent(this.originalEvents))
-      .toIfHeldDown(this.mods)
-      .toDelayedAction([], cancelledAction)
+
+    if (this.isPermissive) {
+      m.to({
+        ...this.mods,
+        lazy: true
+      })
+    } else {
+      m.toDelayedAction([], this.originalEvents)
+        .toIfHeldDown({
+          ...this.mods,
+          halt: true,
+        })
+    }
 
     if (this.tappingTermMs !== undefined) {
       m.parameters({
@@ -94,7 +104,6 @@ export class ModTapBuilder {
 
   public modifiers(modifiers: ToEvent): this {
     this.mods = modifiers;
-    this.mods.halt = true;
     return this;
   }
 
