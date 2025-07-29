@@ -66,6 +66,17 @@ function applyConditionToToEvents(m: BasicManipulator, cond: Condition) {
   }
 }
 
+export type SlowManipulator = BasicManipulator & { from: { key_code: FromAndToKeyCode } };
+
+function isSlowManipulator(manipulator: BasicManipulator): manipulator is SlowManipulator {
+  return (
+    typeof manipulator.from === "object" &&
+    manipulator.from !== null &&
+    "key_code" in manipulator.from &&
+    isFromAndToKeyCode(manipulator.from.key_code)
+  );
+}
+
 /**
  * The hold-tap layer builder.
  */
@@ -286,36 +297,19 @@ export class HoldTapLayerBuilder {
     return this
   }
 
+
   /**
    * Adds a slow manipulator to the layer.
    *
    * A slow manipulator is a manipulator that only triggers when
    * the tapping term has elapsed.
    */
-  public slowManipulator(manipulator: BasicManipulator | BasicManipulatorBuilder): this {
+  public slowManipulator(manipulator: SlowManipulator): this {
     // Validate input parameters.
-    if ("build" in manipulator) {
-      let manipulators = manipulator.build();
-      if (manipulators.length !== 1) {
-        throw new Error("slowManipulator expects a single manipulator.");
-      }
-      manipulator = manipulators[0];
-    }
-
-    assert(
-      "from" in manipulator && "key_code" in manipulator.from,
-      "slowManipulator expects a BasicManipulator with a 'from' key code," +
-      ` but got ${JSON.stringify(manipulator)}.`
-    );
-
     const fromKeyCode = manipulator.from.key_code;
-    if (!isFromAndToKeyCode(fromKeyCode)) {
-      throw new Error("The 'from' key code must be a FromAndToKeyCode but is: " + fromKeyCode);
-    }
     if (!isFromAndToKeyCode(this.key)) {
       throw new Error("The layer key must be a FromAndToKeyCode but is: " + this.key);
     }
-
 
     let ifStartVariable = ifVar(this.startVariable);
     let unlessStartVariable = ifVar(this.startVariable).unless()
@@ -336,8 +330,19 @@ export class HoldTapLayerBuilder {
   public slowManipulators(
     ...manipulators: (BasicManipulator | BasicManipulatorBuilder)[]
   ): this {
-    for (const manipulator of manipulators) {
-      this.slowManipulator(manipulator);
+    let newManipulators = manipulators.flatMap((manipulatorOrBuilder) => {
+      if ("build" in manipulatorOrBuilder) {
+        return manipulatorOrBuilder.build();
+      }
+      return [manipulatorOrBuilder];
+    })
+    for (const manipulator of newManipulators) {
+      if (isSlowManipulator(manipulator)) {
+        this.slowManipulator(manipulator);
+      } else {
+        throw new Error("slowManipulators expects a SlowManipulator but got: " +
+          JSON.stringify(manipulator));
+      }
     }
     return this
   }

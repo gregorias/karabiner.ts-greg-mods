@@ -1,4 +1,4 @@
-import { holdTapLayer } from '../src/hold-tap-layer';
+import { holdTapLayer, SlowManipulator } from '../src/hold-tap-layer';
 import { map } from 'karabiner.ts';
 
 describe('holdTapLayer', () => {
@@ -13,10 +13,12 @@ describe('holdTapLayer', () => {
     expect(manipulator.to).toEqual(
       expect.arrayContaining([{ set_variable: { name: 'layer-a-start', value: 1 } }])
     );
-    expect(manipulator.to_if_held_down).toEqual([{ set_variable: {
-      name: 'layer-a-start',
-      value: 0,
-    } }]);
+    expect(manipulator.to_if_held_down).toEqual([{
+      set_variable: {
+        name: 'layer-a-start',
+        value: 0,
+      }
+    }]);
     expect(manipulator.to_after_key_up).toEqual(
       expect.arrayContaining([{ set_variable: { name: 'layer-a-start', value: 0 } }])
     );
@@ -70,7 +72,9 @@ describe('holdTapLayer', () => {
   });
 
   it('should add a slowManipulator', () => {
-    const rule = holdTapLayer('a').slowManipulator(map('b').to('c')).build();
+    const rule = holdTapLayer('a').slowManipulator(
+      map('b').to('c').build()[0] as SlowManipulator
+    ).build();
     expect(rule.manipulators).toHaveLength(3); // config, unless, if
 
     const unlessManipulator = rule.manipulators[1] as any;

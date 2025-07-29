@@ -20,7 +20,6 @@ import {
   toKey,
   ToKeyParam,
   getKeyWithAlias,
-  PointingButton,
   toPointingButton,
   mapPointingButton,
 } from "karabiner.ts";
