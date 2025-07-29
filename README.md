@@ -95,6 +95,20 @@ If you don’t want to lose the layer key during writing,
 you need to define any keys it might roll over with either as a manipulator or
 as an echo key. I just provide a list of all keys on my keyboard as echo keys.
 
+Permissive-hold manipulators don’t work well with triple or near-triple key
+roll over. For example, with the following scenario:
+
+1. Layer key down (`s`).
+1. Permissive-hold key down (`e`).
+1. Layer key up (`s`).
+1. Another key down (`t`).
+1. Permissive-hold key up (`e`).
+
+You’ll get `tse` instead of expected `set`, because `e` will replay the layer
+key on the key-up event (that’s how permissive-hold is implemented).
+Such combinations can happen if you type fast.
+Enabling chordal hold on your HRM helps, because it uses the slow-mode.
+
 ### Mod-tap
 
 A `mod-tap` key is a dual-function key that acts as a normal key when tapped
