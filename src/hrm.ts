@@ -282,7 +282,9 @@ export class HrmBuilder {
 
     let smartManipulators: BasicManipulator[] = this.smartManipulatorMap.get(hrmMod);
 
-    let mtLayer = modTapLayer(hrmKey, hrmMod).lazy(this.isLazy)
+    let mtLayer = modTapLayer(hrmKey, hrmMod)
+      .allowAnyModifiers()
+      .lazy(this.isLazy)
 
     for (const sm of smartManipulators) {
       const smFrom = getFromKeyCodeFromBasicManipulator(sm);

@@ -36,6 +36,14 @@ export class ModTapLayerBuilder {
   }
 
   /**
+   * Allows any modifiers to be used with the layer key.
+   */
+  public allowAnyModifiers(): this {
+    this.hold_tap_layer_builder.allowAnyModifiers();
+    return this;
+  }
+
+  /**
    * Sets the description for the rule.
    */
   public description(description: string): this {

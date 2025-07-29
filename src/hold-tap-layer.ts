@@ -112,6 +112,14 @@ export class HoldTapLayerBuilder {
   }
 
   /**
+   * Allows any modifiers to be used with the layer key.
+   */
+  public allowAnyModifiers(): this {
+    this.configKeyOptionalMods = ['any']
+    return this;
+  }
+
+  /**
    * Sets the description for the rule.
    */
   public description(description: string): this {
