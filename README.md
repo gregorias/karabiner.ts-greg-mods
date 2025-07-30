@@ -7,6 +7,33 @@ This package builds upon these layers to provide the first turn-key solution
 for [home row mods](#home-row-mods) that works almost like on a QMK keyboard,
 i.e., it’s good.
 
+## 🔧 Home row mods tutorial
+
+This section provides a step-by-step guide to installing home row mods on your
+mac. I wrote it, so that it can be followed even if you are not a tech person.
+You need to have basic familiarity with the command-line and have
+[node](https://formulae.brew.sh/formula/node) and
+[gh](https://formulae.brew.sh/formula/gh) installed.
+
+1. [Install Karabiner.](https://karabiner-elements.pqrs.org/docs/getting-started/installation/)
+2. [Install Karabiner.ts.](https://github.com/evan-liu/karabiner.ts?tab=readme-ov-file#using-nodejs)
+   1. Open a terminal and in your home directory run
+      `npx create-karabiner-config@latest`.
+      This will create a `karabiner-config` directory.
+   2. In `karabiner-config/src/index.ts` change `--dry-run` to whatever
+      you want your Karabiner profile to be called.
+3. Install Greg’s Karabiner.ts Mods.
+   1. In your home directory run `gh repo clone gregorias/karabiner.ts-greg-mods`.
+   2. Change directory to `karabiner.ts-greg-mods`.
+   3. Run `npm install`.
+   4. Run `npm run build`.
+4. Plug in Greg Mods to your `karabiner-config`.
+   1. Change directory to `karabiner-config`.
+   2. Add `karabiner.ts-greg-mods` to `package.json`:
+      TODO: add an example.
+
+TODO
+
 ## 📦 Installation
 
 ### From source
@@ -162,7 +189,8 @@ let hrmRule: Manipulator[] = hrm(
     ["k", "r⇧"],
     ["l", "r⌘"],
     [";", "r⌃"]
-  ]))
+  ])
+)
   .lazy(true)
   .holdTapStrategy("permissive-hold")
   .chordalHold(true)
