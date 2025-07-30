@@ -1,0 +1,28 @@
+pre-commit:
+  parallel: true
+  commands:
+    js-prettier:
+      tags: style
+      files: git diff --name-only --cached --diff-filter=AM
+      glob: "*.{js,jsx,mjs,ts,tsx,mts}"
+      run: prettier -c {staged_files}
+    json-prettier:
+      tags: style
+      glob: "*.json"
+      run: prettier -c {staged_files}
+    markdownlint:
+      tags: documentation style
+      files: git diff --name-only --cached --diff-filter=AM
+      glob: "*.md"
+      run: markdownlint {files}
+    yaml-prettier:
+      tags: style
+      glob: "*.{yml,yaml}"
+      run: prettier -c {staged_files}
+    test:
+      tags: test
+      run: npm run test
+commit-msg:
+  commands:
+    commitlint:
+      run: commitlint --edit={1}
