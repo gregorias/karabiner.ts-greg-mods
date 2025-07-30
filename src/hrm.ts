@@ -71,10 +71,9 @@ function getTriples<T>(keys: Iterable<T>): Array<[T, T, T]> {
   return out;
 }
 
-export declare type LeftModifierFlag = 'left' | 'l' | '<' | '‹';
+export declare type LeftModifierFlag = "left" | "l" | "<" | "‹";
 
-
-export type HrmKey = (FromAndToKeyCode | KeyAlias);
+export type HrmKey = FromAndToKeyCode | KeyAlias;
 export type HrmMod = SideModifierAlias & ToKeyParam;
 export type HrmKeyParam = (FromAndToKeyCode | KeyAlias) & LayerKeyParam;
 
@@ -84,24 +83,81 @@ export class HrmKeyboardLayout {
 
   constructor(
     leftHandKeys: Array<FromAndToKeyCode | KeyAlias>,
-    rightHandKeys: Array<FromAndToKeyCode | KeyAlias>
+    rightHandKeys: Array<FromAndToKeyCode | KeyAlias>,
   ) {
-    this.leftHandKeys = leftHandKeys.map(k => getKeyWithAlias<FromAndToKeyCode>(k));
-    this.rightHandKeys = rightHandKeys.map(k => getKeyWithAlias<FromAndToKeyCode>(k));
+    this.leftHandKeys = leftHandKeys.map((k) =>
+      getKeyWithAlias<FromAndToKeyCode>(k),
+    );
+    this.rightHandKeys = rightHandKeys.map((k) =>
+      getKeyWithAlias<FromAndToKeyCode>(k),
+    );
   }
 }
 
-export type HoldTapStrategy = 'permissive-hold' | 'hold-on-other-key-press' | 'slow'
+const qwertyLeftHandKeys: (FromAndToKeyCode | KeyAlias)[] = [
+  "q",
+  "w",
+  "e",
+  "r",
+  "t",
+  "a",
+  "s",
+  "d",
+  "f",
+  "g",
+  "z",
+  "x",
+  "c",
+  "v",
+  "b",
+];
+
+const qwertyRightHandKeys: (FromAndToKeyCode | KeyAlias)[] = [
+  "y",
+  "u",
+  "i",
+  "o",
+  "p",
+  "[",
+  "]",
+  "\\",
+  "h",
+  "j",
+  "k",
+  "l",
+  ";",
+  "'",
+  "n",
+  "m",
+  ",",
+  ".",
+  "/",
+  "␣",
+  "⏎",
+];
+
+export const qwertyLayout: HrmKeyboardLayout = new HrmKeyboardLayout(
+  qwertyLeftHandKeys,
+  qwertyRightHandKeys,
+);
+
+export type HoldTapStrategy =
+  | "permissive-hold"
+  | "hold-on-other-key-press"
+  | "slow";
 
 /**
  * Given a key and a keyboard layout, returns which side ('left' | 'right') the key is on,
  * or null if the key is not found in either hand.
  */
-export function getSideOfKey(key: FromAndToKeyCode, layout: HrmKeyboardLayout): Side | null {
+export function getSideOfKey(
+  key: FromAndToKeyCode,
+  layout: HrmKeyboardLayout,
+): Side | null {
   if (layout.leftHandKeys.includes(key)) {
-    return 'left';
+    return "left";
   } else if (layout.rightHandKeys.includes(key)) {
-    return 'right';
+    return "right";
   } else {
     return null;
   }
@@ -113,7 +169,9 @@ class SmartModifierMap<T> {
   public get(modifierParam: ModifierParam): T[] {
     let modifiers = parseModifierParam(modifierParam);
     if (!modifiers || modifiers.length != 1) {
-      throw new Error(`Expected a single modifier, but got ${JSON.stringify(modifierParam)}.`);
+      throw new Error(
+        `Expected a single modifier, but got ${JSON.stringify(modifierParam)}.`,
+      );
     }
     let modifier = modifiers[0];
 
@@ -125,12 +183,14 @@ class SmartModifierMap<T> {
     }
 
     return elems;
-  };
+  }
 
   public add(modifierParam: ModifierParam, elem: T): this {
     let modifiers = parseModifierParam(modifierParam);
     if (!modifiers || modifiers.length != 1) {
-      throw new Error(`Expected a single modifier, but got ${JSON.stringify(modifierParam)}.`);
+      throw new Error(
+        `Expected a single modifier, but got ${JSON.stringify(modifierParam)}.`,
+      );
     }
     let modifier = modifiers[0];
 
@@ -144,14 +204,18 @@ export class HrmBuilder {
   private readonly hrmKeys: Map<HrmKeyParam, HrmMod>;
   private readonly keyboardLayout: HrmKeyboardLayout;
   // Manipulators that override the default mod-tap behavior.
-  private smartManipulatorMap: SmartModifierMap<BasicManipulator> = new SmartModifierMap();
-  private smartKeyOverrideMap: SmartModifierMap<[FromAndToKeyCode, HoldTapStrategy]> = new SmartModifierMap();
+  private smartManipulatorMap: SmartModifierMap<BasicManipulator> =
+    new SmartModifierMap();
+  private smartKeyOverrideMap: SmartModifierMap<
+    [FromAndToKeyCode, HoldTapStrategy]
+  > = new SmartModifierMap();
   private isLazy: boolean = false;
-  private chosenHoldTapStrategy: HoldTapStrategy = 'permissive-hold'
+  private chosenHoldTapStrategy: HoldTapStrategy = "permissive-hold";
   private isChordalHold: boolean = false;
 
-  constructor(hrmKeys: Map<HrmKeyParam, HrmMod>,
-    layout: HrmKeyboardLayout
+  constructor(
+    hrmKeys: Map<HrmKeyParam, HrmMod>,
+    layout: HrmKeyboardLayout = qwertyLayout,
   ) {
     this.hrmKeys = hrmKeys;
     this.keyboardLayout = layout;
@@ -174,8 +238,8 @@ export class HrmBuilder {
   }
 
   /**
-  * Enables or disables chordal hold.
-  */
+   * Enables or disables chordal hold.
+   */
   public chordalHold(isChordalHold: boolean): this {
     this.isChordalHold = isChordalHold;
     return this;
@@ -192,11 +256,10 @@ export class HrmBuilder {
 
   public smartManipulator(
     mod: ModifierParam,
-    manipulator: BasicManipulator | BasicManipulatorBuilder
+    manipulator: BasicManipulator | BasicManipulatorBuilder,
   ): this {
-    if ('build' in manipulator) {
-      for (const m of manipulator.build())
-        this.smartManipulatorMap.add(mod, m);
+    if ("build" in manipulator) {
+      for (const m of manipulator.build()) this.smartManipulatorMap.add(mod, m);
     } else {
       this.smartManipulatorMap.add(mod, manipulator);
     }
@@ -219,10 +282,13 @@ export class HrmBuilder {
   public keys(
     mod: ModifierParam,
     keys: FromAndToKeyParam[],
-    strategy: HoldTapStrategy
+    strategy: HoldTapStrategy,
   ): this {
     for (const key of keys) {
-      this.smartKeyOverrideMap.add(mod, [getKeyWithAlias<FromAndToKeyCode>(key), strategy]);
+      this.smartKeyOverrideMap.add(mod, [
+        getKeyWithAlias<FromAndToKeyCode>(key),
+        strategy,
+      ]);
     }
     return this;
   }
@@ -235,24 +301,34 @@ export class HrmBuilder {
     let manipulators: Manipulator[] = [];
 
     for (const side of sides) {
-      const sideKeys: HrmKeyParam[] = Array.from(hrmKeys.keys())
-        .filter(k => getSideOfMod(hrmKeys.get(k) as SideModifierAlias) === side);
+      const sideKeys: HrmKeyParam[] = Array.from(hrmKeys.keys()).filter(
+        (k) => getSideOfMod(hrmKeys.get(k) as SideModifierAlias) === side,
+      );
 
       for (const [first, second, third] of getTriples(sideKeys)) {
-        manipulators = manipulators.concat(modTap()
-          .from([first, second, third], [], "any")
-          .modifiers(toKey(hrmKeys.get(first) as ToKeyParam, [
-            hrmKeys.get(second) as SideModifierAlias,
-            hrmKeys.get(third) as SideModifierAlias]))
-          .permissive(true)
-          .build())
+        manipulators = manipulators.concat(
+          modTap()
+            .from([first, second, third], [], "any")
+            .modifiers(
+              toKey(hrmKeys.get(first) as ToKeyParam, [
+                hrmKeys.get(second) as SideModifierAlias,
+                hrmKeys.get(third) as SideModifierAlias,
+              ]),
+            )
+            .permissive(true)
+            .build(),
+        );
       }
       for (const [first, second] of getDoubles(sideKeys)) {
-        manipulators = manipulators.concat(modTap()
-          .from([first, second], [], "any")
-          .modifiers(toKey(hrmKeys.get(first) as ToKeyParam, hrmKeys.get(second)))
-          .permissive(true)
-          .build())
+        manipulators = manipulators.concat(
+          modTap()
+            .from([first, second], [], "any")
+            .modifiers(
+              toKey(hrmKeys.get(first) as ToKeyParam, hrmKeys.get(second)),
+            )
+            .permissive(true)
+            .build(),
+        );
       }
     }
 
@@ -262,47 +338,61 @@ export class HrmBuilder {
   private singleManipulators(): Manipulator[] {
     let manipulators: Manipulator[] = [];
     for (const [hrmKey, hrmMod] of this.hrmKeys.entries()) {
-      manipulators = manipulators.concat(this.singleManipulatorLayer(hrmKey, hrmMod));
+      manipulators = manipulators.concat(
+        this.singleManipulatorLayer(hrmKey, hrmMod),
+      );
     }
     return manipulators;
   }
 
-  private singleManipulatorLayer(hrmKey: HrmKeyParam, hrmMod: SideModifierAlias): Manipulator[] {
+  private singleManipulatorLayer(
+    hrmKey: HrmKeyParam,
+    hrmMod: SideModifierAlias,
+  ): Manipulator[] {
     const side: Side | null = getSideOfMod(hrmMod);
     if (side === null) {
-      throw new Error(`Expected a sided modifier, but got ${JSON.stringify(hrmMod)}.`);
+      throw new Error(
+        `Expected a sided modifier, but got ${JSON.stringify(hrmMod)}.`,
+      );
     }
 
-    let smartManipulators: BasicManipulator[] = this.smartManipulatorMap.get(hrmMod);
+    let smartManipulators: BasicManipulator[] =
+      this.smartManipulatorMap.get(hrmMod);
 
     let mtLayer = modTapLayer(hrmKey, hrmMod)
       .allowAnyModifiers()
-      .lazy(this.isLazy)
+      .lazy(this.isLazy);
 
     for (const sm of smartManipulators) {
       const smFrom = getFromKeyCodeFromBasicManipulator(sm);
       if (smFrom === null) {
-        throw new Error(`Expected a from key code in a smart manipulator but got ${JSON.stringify(sm)}.`);
+        throw new Error(
+          `Expected a from key code in a smart manipulator but got ${JSON.stringify(sm)}.`,
+        );
       }
       if (!isFromAndToKeyCode(smFrom)) {
-        throw new Error(`Expected a from and to key code in a smart manipulator but got ${JSON.stringify(smFrom)}.`);
+        throw new Error(
+          `Expected a from and to key code in a smart manipulator but got ${JSON.stringify(smFrom)}.`,
+        );
       }
       const smSide = getSideOfKey(smFrom, this.keyboardLayout);
       if (smSide === null) {
-        throw new Error(`Could not determine the side of the smart manipulator key, ${JSON.stringify(smFrom)}.`);
+        throw new Error(
+          `Could not determine the side of the smart manipulator key, ${JSON.stringify(smFrom)}.`,
+        );
       }
 
       if (this.isChordalHold && smSide === side) {
         mtLayer.slowManipulators(sm);
       } else {
         switch (this.chosenHoldTapStrategy) {
-          case 'permissive-hold':
+          case "permissive-hold":
             mtLayer.permissiveHoldManipulators(sm);
             break;
-          case 'hold-on-other-key-press':
+          case "hold-on-other-key-press":
             mtLayer.holdOnOtherKeyPressManipulator(sm);
             break;
-          case 'slow':
+          case "slow":
             mtLayer.slowManipulators(sm);
             break;
           default:
@@ -311,17 +401,18 @@ export class HrmBuilder {
       }
     }
 
-    let keyOverrides: [FromAndToKeyCode, HoldTapStrategy][] = this.smartKeyOverrideMap.get(hrmMod);
+    let keyOverrides: [FromAndToKeyCode, HoldTapStrategy][] =
+      this.smartKeyOverrideMap.get(hrmMod);
 
     for (const [key, strategy] of keyOverrides) {
       switch (strategy) {
-        case 'permissive-hold':
+        case "permissive-hold":
           mtLayer.permissiveHoldKey(key);
           break;
-        case 'hold-on-other-key-press':
+        case "hold-on-other-key-press":
           mtLayer.holdOnOtherKeyPressKeys([key]);
           break;
-        case 'slow':
+        case "slow":
           mtLayer.slowKeys([key]);
           break;
         default:
@@ -329,17 +420,23 @@ export class HrmBuilder {
       }
     }
 
-    let smartKeys = side === 'left' ? this.keyboardLayout.rightHandKeys : this.keyboardLayout.leftHandKeys;
-    let slowKeys = side === 'left' ? this.keyboardLayout.leftHandKeys : this.keyboardLayout.rightHandKeys;
+    let smartKeys =
+      side === "left"
+        ? this.keyboardLayout.rightHandKeys
+        : this.keyboardLayout.leftHandKeys;
+    let slowKeys =
+      side === "left"
+        ? this.keyboardLayout.leftHandKeys
+        : this.keyboardLayout.rightHandKeys;
 
     switch (this.chosenHoldTapStrategy) {
-      case 'permissive-hold':
+      case "permissive-hold":
         mtLayer.permissiveHoldKeys(...smartKeys);
         break;
-      case 'hold-on-other-key-press':
+      case "hold-on-other-key-press":
         mtLayer.holdOnOtherKeyPressKeys(smartKeys);
         break;
-      case 'slow':
+      case "slow":
         mtLayer.slowKeys(smartKeys);
         break;
       default:
@@ -347,16 +444,16 @@ export class HrmBuilder {
     }
 
     if (this.isChordalHold) {
-      mtLayer.slowKeys(slowKeys)
+      mtLayer.slowKeys(slowKeys);
     } else {
       switch (this.chosenHoldTapStrategy) {
-        case 'permissive-hold':
+        case "permissive-hold":
           mtLayer.permissiveHoldKeys(...slowKeys);
           break;
-        case 'hold-on-other-key-press':
+        case "hold-on-other-key-press":
           mtLayer.holdOnOtherKeyPressKeys(slowKeys);
           break;
-        case 'slow':
+        case "slow":
           mtLayer.slowKeys(slowKeys);
           break;
         default:
@@ -365,8 +462,8 @@ export class HrmBuilder {
     }
     // Let the primary mouse button benefit from modifiers.
     mtLayer.holdOnOtherKeyPressManipulator(
-      mapPointingButton("button1").to(toPointingButton("button1", hrmMod))
-    )
+      mapPointingButton("button1").to(toPointingButton("button1", hrmMod)),
+    );
 
     return mtLayer.build().manipulators;
   }
@@ -374,6 +471,7 @@ export class HrmBuilder {
 
 export function hrm(
   hrmKeys: Map<HrmKeyParam, SideModifierAlias & ToKeyParam>,
-  layout: HrmKeyboardLayout): HrmBuilder {
+  layout: HrmKeyboardLayout = qwertyLayout,
+): HrmBuilder {
   return new HrmBuilder(hrmKeys, layout);
 }

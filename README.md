@@ -158,13 +158,11 @@ let hrmRule: Manipulator[] = hrm(
     ["s", "l⌘"],
     ["d", "l⇧"],
     ["f", "l⌥"],
-    ["p", "r⇧"],
+    ["j", "r⇧"],
     ["k", "r⇧"],
     ["l", "r⌘"],
     [";", "r⌃"]
-  ]),
-  new HrmKeyboardLayout(leftHandKeys, rightHandKeys)
-)
+  ]))
   .lazy(true)
   .holdTapStrategy("permissive-hold")
   .chordalHold(true)
