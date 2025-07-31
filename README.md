@@ -30,9 +30,54 @@ You need to have basic familiarity with the command-line and have
 4. Plug in Greg Mods to your `karabiner-config`.
    1. Change directory to `karabiner-config`.
    2. Add `karabiner.ts-greg-mods` to `package.json`:
-      TODO: add an example.
 
-TODO
+      ```json
+      {
+        "name": "karabiner-config",
+        "description": "karabiner config in karabiner.ts",
+        "scripts": {
+          "build": "tsx src/index.ts",
+          "update": "npm update karabiner.ts"
+        },
+        "devDependencies": {
+          "@types/node": "^20",
+          "karabiner.ts": "latest",
+          "karabiner.ts-greg-mods": "file:../karabiner.ts-greg-mods",
+          "tsx": "^4",
+          "typescript": "^5"
+        }
+      }
+      ```
+
+   3. Run `npm install`
+
+5. Configure HRM by adding them to the Karabiner.ts config in `src/index.ts`:
+
+   ```typescript
+   import { rule, writeToProfile } from "karabiner.ts";
+   import { hrm } from "karabiner.ts-greg-mods";
+
+   // ! Change '--dry-run' to your Karabiner-Elements Profile name.
+   // (--dry-run print the config json into console)
+   // + Create a new profile if needed.
+   writeToProfile("Default profile", [
+     rule("Home row mods").manipulators(
+       hrm(
+         new Map([
+           ["a", "l⌃"],
+           ["s", "l⌘"],
+           ["d", "l⇧"],
+           ["f", "l⌥"],
+           ["k", "r⇧"],
+           ["l", "r⌘"],
+           [";", "r⌃"]
+         ])
+       ).build()
+     )
+   ]);
+   ```
+
+6. Install the new config with `npm run build`.
 
 ## 📦 Installation
 
