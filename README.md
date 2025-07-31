@@ -49,7 +49,7 @@ You need to have basic familiarity with the command-line and have
       }
       ```
 
-   3. Run `npm install`
+   3. Run `npm install`.
 
 5. Configure HRM by adding them to the Karabiner.ts config in `src/index.ts`:
 
@@ -77,7 +77,7 @@ You need to have basic familiarity with the command-line and have
    ]);
    ```
 
-6. Install the new config with `npm run build`.
+6. Install the new Karabiner.ts config in Karabiner with `npm run build`.
 
 ## 📦 Installation
 
