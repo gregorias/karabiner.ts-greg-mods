@@ -271,5 +271,10 @@ let hrmRule: Manipulator[] = hrm(
 - Key replaying doesn’t work with modified keys. It is technically feasible,
   but I figured that such a capability is not worth additional rules.
 
+## 🔗 See also
+
+- [How to simulate QMK home row mods in karabiner? (Karabiner#3559)](https://github.com/pqrs-org/Karabiner-Elements/issues/3559)
+  — A feature request for Karabiner to enable HRM-capabilities.
+
 [karabiner.ts]: https://karabiner.ts.evanliu.dev/
 [permissive-hold]: https://docs.qmk.fm/tap_hold#:~:text=The%20%E2%80%9Cpermissive%20hold%E2%80%9D%20mode,select%20the%20tap%20action.
