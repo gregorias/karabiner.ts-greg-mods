@@ -214,7 +214,7 @@ export class HrmBuilder {
   > = new SmartModifierMap();
   private isLazy: boolean = false;
   private chosenHoldTapStrategy: HoldTapStrategy = "permissive-hold";
-  private isChordalHold: boolean = false;
+  private isChordalHold: boolean = true;
   private hasTriples: boolean = true;
 
   constructor(
