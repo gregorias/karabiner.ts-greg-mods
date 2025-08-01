@@ -268,6 +268,8 @@ let hrmRule: Manipulator[] = hrm(
 - You can’t chain modifiers, e.g., you can’t press and hold l⌃ and then press
   and hold l⌘. You must press two modifiers simultaneously to have them
   available.
+- Key replaying doesn’t work with modified keys. It is technically feasible,
+  but I figured that such a capability is not worth additional rules.
 
 [karabiner.ts]: https://karabiner.ts.evanliu.dev/
 [permissive-hold]: https://docs.qmk.fm/tap_hold#:~:text=The%20%E2%80%9Cpermissive%20hold%E2%80%9D%20mode,select%20the%20tap%20action.
