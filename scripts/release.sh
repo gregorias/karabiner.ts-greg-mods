@@ -19,6 +19,7 @@ new_version=$(node -p "require('./package.json').version")
 
 # Push the commit and tags to the git remote
 git push
+git push origin v$new_version
 npm publish
 
 echo "✅ Release published successfully!"

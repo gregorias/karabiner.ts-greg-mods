@@ -4,5 +4,5 @@ build:
 test:
   npm test
 
-publish: build test
-  npm publish
+release: build test
+  ./scripts/release.sh
