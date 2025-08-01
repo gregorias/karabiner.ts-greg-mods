@@ -22,6 +22,8 @@ import {
   getKeyWithAlias,
   toPointingButton,
   mapPointingButton,
+  withCondition,
+  ifVar,
 } from "karabiner.ts";
 import { modTap } from "./mod-tap";
 import { modTapLayer } from "./mod-tap-layer";
@@ -33,6 +35,7 @@ import {
   getUnsidedMod,
   isFromAndToKeyCode,
   isSidedMod,
+  layerVarName,
   Side,
   sides,
 } from "./karabiner-extra";
@@ -212,6 +215,7 @@ export class HrmBuilder {
   private isLazy: boolean = false;
   private chosenHoldTapStrategy: HoldTapStrategy = "permissive-hold";
   private isChordalHold: boolean = false;
+  private hasTriples: boolean = true;
 
   constructor(
     hrmKeys: Map<HrmKeyParam, HrmMod>,
@@ -242,6 +246,14 @@ export class HrmBuilder {
    */
   public chordalHold(isChordalHold: boolean): this {
     this.isChordalHold = isChordalHold;
+    return this;
+  }
+
+  /**
+   * Sets whether the builder should generate 3-key chords.
+   */
+  public triples(hasTriples: boolean) {
+    this.hasTriples = hasTriples;
     return this;
   }
 
@@ -305,20 +317,23 @@ export class HrmBuilder {
         (k) => getSideOfMod(hrmKeys.get(k) as SideModifierAlias) === side,
       );
 
-      for (const [first, second, third] of getTriples(sideKeys)) {
-        manipulators = manipulators.concat(
-          modTap()
-            .from([first, second, third], [], "any")
-            .modifiers(
-              toKey(hrmKeys.get(first) as ToKeyParam, [
-                hrmKeys.get(second) as SideModifierAlias,
-                hrmKeys.get(third) as SideModifierAlias,
-              ]),
-            )
-            .permissive(true)
-            .build(),
-        );
+      if (this.hasTriples) {
+        for (const [first, second, third] of getTriples(sideKeys)) {
+          manipulators = manipulators.concat(
+            modTap()
+              .from([first, second, third], [], "any")
+              .modifiers(
+                toKey(hrmKeys.get(first) as ToKeyParam, [
+                  hrmKeys.get(second) as SideModifierAlias,
+                  hrmKeys.get(third) as SideModifierAlias,
+                ]),
+              )
+              .permissive(true)
+              .build(),
+          );
+        }
       }
+
       for (const [first, second] of getDoubles(sideKeys)) {
         manipulators = manipulators.concat(
           modTap()
@@ -332,7 +347,7 @@ export class HrmBuilder {
       }
     }
 
-    return manipulators;
+    return withCondition(ifVar(layerVarName).unless())(manipulators);
   }
 
   private singleManipulators(): Manipulator[] {
