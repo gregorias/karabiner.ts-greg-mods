@@ -12,7 +12,7 @@ import {
   SideModifierAlias,
   KeyAlias,
   Rule,
-} from "karabiner.ts"
+} from "karabiner.ts";
 import { holdTapLayer, HoldTapLayerBuilder } from "./hold-tap-layer";
 import { BasicManipulatorBuilder, FromAndToKeyParam } from "./karabiner-extra";
 
@@ -67,18 +67,27 @@ export class ModTapLayerBuilder {
     // `.toIfHeldDown(mod)` needs to be last to ensure that Karabiner holds the modifier.
     // `toSetVar` would interrupt the hold action.
     //
-    return this.hold_tap_layer_builder.onHold(this.mod, [], { lazy: this.isLazy })
+    return this.hold_tap_layer_builder
+      .onHold(this.mod, [], { lazy: this.isLazy })
       .build();
   }
 
-  public holdOnOtherKeyPressManipulator(arg: Parameters<typeof this.hold_tap_layer_builder.holdOnOtherKeyPressManipulator>[0]): this {
-    this.hold_tap_layer_builder.holdOnOtherKeyPressManipulator(arg)
-    return this
+  public holdOnOtherKeyPressManipulator(
+    arg: Parameters<
+      typeof this.hold_tap_layer_builder.holdOnOtherKeyPressManipulator
+    >[0],
+  ): this {
+    this.hold_tap_layer_builder.holdOnOtherKeyPressManipulator(arg);
+    return this;
   }
 
-  public holdOnOtherKeyPressManipulators(arg: Parameters<typeof this.hold_tap_layer_builder.holdOnOtherKeyPressManipulators>[0]): this {
-    this.hold_tap_layer_builder.holdOnOtherKeyPressManipulators(arg)
-    return this
+  public holdOnOtherKeyPressManipulators(
+    arg: Parameters<
+      typeof this.hold_tap_layer_builder.holdOnOtherKeyPressManipulators
+    >[0],
+  ): this {
+    this.hold_tap_layer_builder.holdOnOtherKeyPressManipulators(arg);
+    return this;
   }
 
   /**
@@ -86,18 +95,20 @@ export class ModTapLayerBuilder {
    *
    * HOOKP keys immediately send the key with the layer's modifier.
    */
-  public holdOnOtherKeyPressKeys(keys: Array<FromAndToKeyCode | KeyAlias>): this {
+  public holdOnOtherKeyPressKeys(
+    keys: Array<FromAndToKeyCode | KeyAlias>,
+  ): this {
     for (const key of keys) {
       this.holdOnOtherKeyPressManipulator(map(key).to(key, this.mod));
     }
-    return this
+    return this;
   }
 
   public permissiveHoldManipulators(
-    ...manipulators: (BasicManipulator  | BasicManipulatorBuilder)[]
+    ...manipulators: (BasicManipulator | BasicManipulatorBuilder)[]
   ): this {
     this.hold_tap_layer_builder.permissiveHoldManipulators(...manipulators);
-    return this
+    return this;
   }
 
   /**
@@ -105,15 +116,16 @@ export class ModTapLayerBuilder {
    */
   public permissiveHoldKey(from: FromAndToKeyParam): this {
     this.hold_tap_layer_builder.permissiveHoldManipulator(
-      map(from).to(from, this.mod));
-    return this
+      map(from).to(from, this.mod),
+    );
+    return this;
   }
 
   public permissiveHoldKeys(...keys: Array<FromAndToKeyParam>): this {
     for (const key of keys) {
       this.permissiveHoldKey(key);
     }
-    return this
+    return this;
   }
 
   /**
@@ -126,20 +138,25 @@ export class ModTapLayerBuilder {
    */
   public slowKeys(keys: Array<FromAndToKeyParam>): this {
     for (const key of keys) {
-      this.hold_tap_layer_builder.slowManipulators(...map(key).to(key, this.mod).build());
+      this.hold_tap_layer_builder.slowManipulators(
+        ...map(key).to(key, this.mod).build(),
+      );
     }
-    return this
+    return this;
   }
 
   public slowManipulators(...manipulators: BasicManipulator[]): this {
     this.hold_tap_layer_builder.slowManipulators(...manipulators);
-    return this
+    return this;
   }
 }
 
 /**
  * Creates a builder for the mod-tap layer.
  */
-export function modTapLayer(key: LayerKeyParam, mod: SideModifierAlias): ModTapLayerBuilder {
+export function modTapLayer(
+  key: LayerKeyParam,
+  mod: SideModifierAlias,
+): ModTapLayerBuilder {
   return new ModTapLayerBuilder(key, mod);
 }

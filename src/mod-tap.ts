@@ -25,7 +25,7 @@ import {
   map,
   parseFromModifierParams,
   parseModifierParam,
-} from "karabiner.ts"
+} from "karabiner.ts";
 
 export class ModTapBuilder {
   private fromEvent!: FromEvent;
@@ -34,59 +34,70 @@ export class ModTapBuilder {
   private mods!: ToEvent;
   private tappingTermMs?: number;
 
-  constructor() {
-  }
+  constructor() {}
 
   public build(): BasicManipulator[] {
-    let m = map(this.fromEvent)
-      .toIfAlone(this.copyAndAddHaltToFirstToEvent(this.originalEvents))
+    let m = map(this.fromEvent).toIfAlone(
+      this.copyAndAddHaltToFirstToEvent(this.originalEvents),
+    );
 
     if (this.isPermissive) {
       m.to({
         ...this.mods,
-        lazy: true
-      })
+        lazy: true,
+      });
     } else {
-      m.toDelayedAction([], this.originalEvents)
-        .toIfHeldDown({
-          ...this.mods,
-          halt: true,
-        })
+      m.toDelayedAction([], this.originalEvents).toIfHeldDown({
+        ...this.mods,
+        halt: true,
+      });
     }
 
     if (this.tappingTermMs !== undefined) {
       m.parameters({
         "basic.to_if_held_down_threshold_milliseconds": this.tappingTermMs,
-      })
+      });
     }
 
     return m.build();
   }
 
-  public from(keyCodeAlias: FromAndToKeyCode | KeyAlias | Array<FromAndToKeyCode | KeyAlias>,
+  public from(
+    keyCodeAlias:
+      | FromAndToKeyCode
+      | KeyAlias
+      | Array<FromAndToKeyCode | KeyAlias>,
     mandatoryModifiers?: FromModifierParam & ModifierParam,
-    optionalModifiers?: FromModifierParam): this {
+    optionalModifiers?: FromModifierParam,
+  ): this {
     if (Array.isArray(keyCodeAlias)) {
-      const keyCodes = keyCodeAlias.map(
-        function(keyCodeAlias) {
-          return { key_code: getKeyWithAlias<FromAndToKeyCode>(keyCodeAlias) };
-        })
+      const keyCodes = keyCodeAlias.map(function (keyCodeAlias) {
+        return { key_code: getKeyWithAlias<FromAndToKeyCode>(keyCodeAlias) };
+      });
       this.fromEvent = {
         simultaneous: keyCodes,
         simultaneous_options: { key_down_order: "strict" },
-        modifiers: parseFromModifierParams(mandatoryModifiers, optionalModifiers)
+        modifiers: parseFromModifierParams(
+          mandatoryModifiers,
+          optionalModifiers,
+        ),
       };
       this.originalEvents = keyCodes;
     } else {
-      const keyCode = getKeyWithAlias<FromAndToKeyCode>(keyCodeAlias)
+      const keyCode = getKeyWithAlias<FromAndToKeyCode>(keyCodeAlias);
       this.fromEvent = {
         key_code: keyCode,
-        modifiers: parseFromModifierParams(mandatoryModifiers, optionalModifiers),
+        modifiers: parseFromModifierParams(
+          mandatoryModifiers,
+          optionalModifiers,
+        ),
       };
-      this.originalEvents = [{
-        key_code: keyCode,
-        modifiers: parseModifierParam(mandatoryModifiers),
-      }];
+      this.originalEvents = [
+        {
+          key_code: keyCode,
+          modifiers: parseModifierParam(mandatoryModifiers),
+        },
+      ];
     }
     return this;
   }
@@ -98,8 +109,8 @@ export class ModTapBuilder {
    * A non-permissive mod-tap key requires the tapping term to pass before activating.
    */
   public permissive(val: boolean): this {
-    this.isPermissive = val
-    return this
+    this.isPermissive = val;
+    return this;
   }
 
   public modifiers(modifiers: ToEvent): this {
@@ -118,7 +129,9 @@ export class ModTapBuilder {
     return this;
   }
 
-  private copyAndAddHaltToFirstToEvent(toEvents: Array<ToEvent>): Array<ToEvent> {
+  private copyAndAddHaltToFirstToEvent(
+    toEvents: Array<ToEvent>,
+  ): Array<ToEvent> {
     if (toEvents.length === 0) {
       return [];
     }
