@@ -1,3 +1,5 @@
-build: npx tsc
+build:
+  npx tsc
 
-test: npm test
+test:
+  npm test

@@ -58,18 +58,20 @@ function applyConditionsToToEvent(e: ToEvent, ...conds: Condition[]): ToEvent {
 
 function applyConditionToToEvents(m: BasicManipulator, cond: Condition) {
   if (m.to) {
-    m.to = m.to.map((e) => applyConditionsToToEvent(e, cond));
+    m.to = m.to.map((e: ToEvent) => applyConditionsToToEvent(e, cond));
   }
   if (m.to_after_key_up) {
-    m.to_after_key_up = m.to_after_key_up.map((e) =>
+    m.to_after_key_up = m.to_after_key_up.map((e: ToEvent) =>
       applyConditionsToToEvent(e, cond),
     );
   }
   if (m.to_if_alone) {
-    m.to_if_alone = m.to_if_alone.map((e) => applyConditionsToToEvent(e, cond));
+    m.to_if_alone = m.to_if_alone.map((e: ToEvent) =>
+      applyConditionsToToEvent(e, cond),
+    );
   }
   if (m.to_if_held_down) {
-    m.to_if_held_down = m.to_if_held_down.map((e) =>
+    m.to_if_held_down = m.to_if_held_down.map((e: ToEvent) =>
       applyConditionsToToEvent(e, cond),
     );
   }
