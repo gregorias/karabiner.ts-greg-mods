@@ -1,13 +1,22 @@
 {
   "name": "karabiner.ts-greg-mods",
   "version": "0.1.0",
-  "description": "Custom modifiers for karabiner.ts",
+  "description": "Powerful mods for karabiner.ts.",
+  "license": "MIT",
+  "author": "Grzegorz Milka",
+  "homepage": "https://github.com/gregorias/karabiner.ts-greg-mods",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gregorias/karabiner.ts-greg-mods.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gregorias/karabiner.ts-greg-mods/issues"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest",
-    "prepublishOnly": "npm run build"
+    "test": "jest"
   },
   "peerDependencies": {
     "karabiner.ts": "^1.33.0"
