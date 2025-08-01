@@ -216,6 +216,8 @@ export class HrmBuilder {
   private chosenHoldTapStrategy: HoldTapStrategy = "permissive-hold";
   private isChordalHold: boolean = true;
   private hasTriples: boolean = true;
+  private simultaneousThresholdMs?: number;
+  private tappingTermMs?: number;
 
   constructor(
     hrmKeys: Map<HrmKeyParam, HrmMod>,
@@ -254,6 +256,25 @@ export class HrmBuilder {
    */
   public triples(hasTriples: boolean) {
     this.hasTriples = hasTriples;
+    return this;
+  }
+
+  /**
+   * Sets the simultaneous threshold in milliseconds.
+   *
+   * Simultaneous threshold is the maximum time in milliseconds Karabiner will wait for a simultaneous
+   * chord to appear for doubles and triples.
+   */
+  public simultaneousThreshold(simultaneousThresholdMs: number): this {
+    this.simultaneousThresholdMs = simultaneousThresholdMs;
+    return this;
+  }
+
+  /**
+   * Sets the tapping term in milliseconds.
+   */
+  public tappingTerm(tappingTermMs: number): this {
+    this.tappingTermMs = tappingTermMs;
     return this;
   }
 
@@ -319,31 +340,41 @@ export class HrmBuilder {
 
       if (this.hasTriples) {
         for (const [first, second, third] of getTriples(sideKeys)) {
-          manipulators = manipulators.concat(
-            modTap()
-              .from([first, second, third], [], "any")
-              .modifiers(
-                toKey(hrmKeys.get(first) as ToKeyParam, [
-                  hrmKeys.get(second) as SideModifierAlias,
-                  hrmKeys.get(third) as SideModifierAlias,
-                ]),
-              )
-              .permissive(true)
-              .build(),
-          );
+          let mt = modTap()
+            .from([first, second, third], [], "any")
+            .modifiers(
+              toKey(hrmKeys.get(first) as ToKeyParam, [
+                hrmKeys.get(second) as SideModifierAlias,
+                hrmKeys.get(third) as SideModifierAlias,
+              ]),
+            )
+            .permissive(true);
+          if (this.simultaneousThresholdMs) {
+            mt.simultaneousThreshold(this.simultaneousThresholdMs);
+          }
+          if (this.tappingTermMs) {
+            mt.tappingTerm(this.tappingTermMs);
+          }
+          manipulators = manipulators.concat(mt.build());
         }
       }
 
       for (const [first, second] of getDoubles(sideKeys)) {
-        manipulators = manipulators.concat(
-          modTap()
-            .from([first, second], [], "any")
-            .modifiers(
-              toKey(hrmKeys.get(first) as ToKeyParam, hrmKeys.get(second)),
-            )
-            .permissive(true)
-            .build(),
-        );
+        let mt = modTap()
+          .from([first, second], [], "any")
+          .modifiers(
+            toKey(hrmKeys.get(first) as ToKeyParam, hrmKeys.get(second)),
+          )
+          .permissive(true);
+
+        if (this.simultaneousThresholdMs) {
+          mt.simultaneousThreshold(this.simultaneousThresholdMs);
+        }
+        if (this.tappingTermMs) {
+          mt.tappingTerm(this.tappingTermMs);
+        }
+
+        manipulators = manipulators.concat(mt.build());
       }
     }
 
@@ -479,6 +510,10 @@ export class HrmBuilder {
     mtLayer.holdOnOtherKeyPressManipulator(
       mapPointingButton("button1").to(toPointingButton("button1", hrmMod)),
     );
+
+    if (this.tappingTermMs) {
+      mtLayer.tappingTerm(this.tappingTermMs);
+    }
 
     return mtLayer.build().manipulators;
   }

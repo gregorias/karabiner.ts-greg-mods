@@ -254,6 +254,8 @@ let hrmRule: Manipulator[] = hrm(
   // I press this combo a lot nad it’s hard to roll over it, so use a more
   // responsive strategy.
   .keys("l⌥", ["w", "q"], "hold-on-other-key-press")
+  .simultaneousThreshold(90)
+  .tappingTerm(110)
   .build();
 ```
 

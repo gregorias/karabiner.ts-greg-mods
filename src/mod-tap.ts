@@ -32,6 +32,7 @@ export class ModTapBuilder {
   private originalEvents: Array<ToEvent> = [];
   private isPermissive: boolean = false;
   private mods!: ToEvent;
+  private simultaneousThresholdMs?: number;
   private tappingTermMs?: number;
 
   constructor() {}
@@ -53,11 +54,10 @@ export class ModTapBuilder {
       });
     }
 
-    if (this.tappingTermMs !== undefined) {
-      m.parameters({
-        "basic.to_if_held_down_threshold_milliseconds": this.tappingTermMs,
-      });
-    }
+    m.parameters({
+      "basic.to_if_held_down_threshold_milliseconds": this.tappingTermMs,
+      "basic.simultaneous_threshold_milliseconds": this.simultaneousThresholdMs,
+    });
 
     return m.build();
   }
@@ -115,6 +115,17 @@ export class ModTapBuilder {
 
   public modifiers(modifiers: ToEvent): this {
     this.mods = modifiers;
+    return this;
+  }
+
+  /**
+   * Sets the simultaneous threshold in milliseconds.
+   *
+   * Simultaneous threshold is the maximum time in milliseconds Karabiner will wait for a simultaneous
+   * chord to appear.
+   */
+  public simultaneousThreshold(simultaneousThresholdMs: number): this {
+    this.simultaneousThresholdMs = simultaneousThresholdMs;
     return this;
   }
 
