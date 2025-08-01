@@ -3,3 +3,6 @@ build:
 
 test:
   npm test
+
+publish: build test
+  npm publish
