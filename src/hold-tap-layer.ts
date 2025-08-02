@@ -130,6 +130,14 @@ export class HoldTapLayerBuilder {
   }
 
   /**
+   * Adds an event for the layer key is pressed alone.
+   */
+  public onAlone(toEvent: ToEvent): this {
+    this.layer_builder.configKey((v) => v.toIfAlone(toEvent));
+    return this;
+  }
+
+  /**
    * Adds an event for the layer key is held down.
    *
    * It's useful for home-row mods.

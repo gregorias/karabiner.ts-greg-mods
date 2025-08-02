@@ -7,6 +7,10 @@ This package builds upon these layers to provide the first turn-key solution
 for [home row mods](#home-row-mods) that works almost like on a QMK keyboard,
 i.e., it’s good.
 
+Additional features:
+
+- [Caps WORD](#caps-word)
+
 ## 🔧 Home row mods tutorial
 
 This section provides a step-by-step guide to installing home row mods on your
@@ -255,6 +259,29 @@ let hrmRule: Manipulator[] = hrm(
   available.
 - Key replaying doesn’t work with modified keys. It is technically feasible,
   but I figured that such a capability is not worth additional rules.
+
+### Caps WORD
+
+[Caps WORD reference at QMK.](https://docs.qmk.fm/features/caps_word)
+
+#### Example configuration
+
+```typescript
+let capsWordRule: Rule = capsWord()
+  .activator(map("c", "Hyper").build()[0]) // ✦+C
+  .defaultEscapeKeys(false)
+  // Pressing these keys turns off Caps WORD in addition to writing them.
+  .escapeKey("⎋")
+  .escapeKey(",")
+  .escapeKey(".")
+  .escapeKey("/", "l⇧") // ?
+  .build();
+
+// Also deactivate Caps WORD with ␣ in the symbols layer.
+let symbolsLayer = holdTapLayer("␣")
+  .onAlone(toSetVar(capsWordVarName(), 0))
+  // …
+```
 
 ## 🔗 See also
 
