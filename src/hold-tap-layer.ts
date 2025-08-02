@@ -108,10 +108,23 @@ export class HoldTapLayerBuilder {
       (v) =>
         v
           // Set the start variable to prevent slow keys from acting with the modifier.
-          .to(toSetVar(this.startVariable, 1))
+          // Add the replay token.
+          .to([
+            toSetVar(this.startVariable, 1),
+            toSetVar(this.replayVariable, 1),
+          ])
           // Unset the start variable on hold.
           .toIfHeldDown(toSetVar(this.startVariable, 0))
-          .toAfterKeyUp(toSetVar(this.startVariable, 0)),
+          .toAfterKeyUp([
+            toSetVar(this.startVariable, 0),
+            // Do not remove the replay token, so we can replay the layer key
+            // during flowing chords:
+            //
+            // LayerKey ↓
+            // OtherKey ↓
+            // LayerKey ↑
+            // OtherKey ↑
+          ]),
       /*replaceToIfAlone*/ false,
     );
   }
@@ -288,6 +301,7 @@ export class HoldTapLayerBuilder {
     // Encode the permissive hold logic inside a manipulator.
     let ifLayerVariable = ifVar(this.layerVariable).build();
     let unlessLayerVariable = ifVar(this.layerVariable).unless().build();
+    let ifReplayVariable = ifVar(this.replayVariable).build();
     let phManipulator: BasicManipulator = {
       ...manipulator,
     };
@@ -301,17 +315,45 @@ export class HoldTapLayerBuilder {
     // If the layer became inactive (interleaved taps), replay the keys.
     phManipulator.to_after_key_up.push(
       {
-        conditions: [unlessLayerVariable],
+        conditions: [unlessLayerVariable, ifReplayVariable],
         key_code: this.key,
-      } as unknown as ToEvent,
+      },
+      {
+        conditions: [unlessLayerVariable, ifReplayVariable],
+        ...toSetVar(this.replayVariable, 0),
+      },
       {
         conditions: [unlessLayerVariable],
         key_code: fromKeyCode,
-      } as unknown as ToEvent,
+      },
       // Unset the start variable. We have triggered the hold action, so we are
       // in.
-      toSetVar(this.startVariable, 0),
+      {
+        ...toSetVar(this.startVariable, 0),
+        halt: true,
+      },
     );
+    phManipulator.to_delayed_action = {
+      to_if_invoked: [],
+      // If we chord with another key that means we are typing, so
+      // we should replay.
+      to_if_canceled: [
+        {
+          conditions: [unlessLayerVariable, ifReplayVariable],
+          key_code: this.key,
+        },
+        {
+          conditions: [unlessLayerVariable, ifReplayVariable],
+          ...toSetVar(this.replayVariable, 0),
+        },
+        {
+          conditions: [unlessLayerVariable],
+          key_code: fromKeyCode,
+          // Cancel the after key up action. We've already replayed the keys.
+          halt: true,
+        },
+      ],
+    };
 
     let ifStartVariable = ifVar(this.startVariable);
     let unlessStartVariable = ifVar(this.startVariable).unless();
@@ -397,6 +439,10 @@ export class HoldTapLayerBuilder {
     // Purposefully using a suffix to make sure this variable is grouped
     // together in Karabiner Event Viewer.
     return this.layerVariable + "-start";
+  }
+
+  private get replayVariable(): string {
+    return this.layerVariable + "-replay";
   }
 
   private setOptionalConfigKeyModifiers(
