@@ -113,6 +113,14 @@ const qwertyLeftHandKeys: (FromAndToKeyCode | KeyAlias)[] = [
   "c",
   "v",
   "b",
+  "escape",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "tab",
+  "caps_lock",
 ];
 
 const qwertyRightHandKeys: (FromAndToKeyCode | KeyAlias)[] = [
@@ -137,6 +145,20 @@ const qwertyRightHandKeys: (FromAndToKeyCode | KeyAlias)[] = [
   "/",
   "␣",
   "⏎",
+  "6",
+  "7",
+  "8",
+  "9",
+  "0",
+  "hyphen",
+  "equal_sign",
+  "delete_or_backspace",
+  "left_arrow",
+  "up_arrow",
+  "down_arrow",
+  "right_arrow",
+  "page_up",
+  "page_down",
 ];
 
 export const qwertyLayout: HrmKeyboardLayout = new HrmKeyboardLayout(
