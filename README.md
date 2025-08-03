@@ -9,6 +9,7 @@ i.e., it’s good.
 
 Additional features:
 
+- [Shift One Shot Modifier](#shift-osm)
 - [Caps WORD](#caps-word)
 
 ## 🔧 Home row mods tutorial
@@ -260,11 +261,30 @@ let hrmRule: Manipulator[] = hrm(
 - Key replaying doesn’t work with modified keys. It is technically feasible,
   but I figured that such a capability is not worth additional rules.
 
+### Shift OSM
+
+The shift one shot modifier rule makes a shift tap into a one shot modifier
+that adds a shift modifier to the next tapped key.
+
+It’s a useful modification for avoiding extensive chording.
+Whenever you need to write a capital letter, tap shift and the letter.
+
+#### Shift OSM example configuration
+
+```typescript
+import { shiftOsm } from "karabiner.ts-greg-mods";
+
+writeToProfile("Default profile", [
+  shiftOsm(),
+  // …
+])
+```
+
 ### Caps WORD
 
 [Caps WORD reference at QMK.](https://docs.qmk.fm/features/caps_word)
 
-#### Example configuration
+#### Caps WORD example configuration
 
 ```typescript
 let capsWordRule: Rule = capsWord()
