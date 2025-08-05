@@ -1,5 +1,4 @@
 // A caps-word layer turns on capitalizing letters until an escape key (⎋ or ␣) is pressed.
-// TODO: allow symbols layer.
 import {
   BasicManipulator,
   Rule,
@@ -48,8 +47,9 @@ export class CapsWordBuilder {
   }
 
   public shiftedKey(key: LetterKeyCode): this {
+    const ifCapsWord = ifVar(capsWordVarName());
     this.layerManipulators.push(
-      ...map(key).condition(ifVar(capsWordVarName())).to(key, "l⇧").build(),
+      ...map(key, null, "any").condition(ifCapsWord).to(key, "l⇧").build(),
     );
     return this;
   }
