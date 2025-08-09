@@ -288,20 +288,18 @@ writeToProfile("Default profile", [
 
 ```typescript
 let capsWordRule: Rule = capsWord()
-  .activator(map("c", "Hyper").build()[0]) // ✦+C
-  .defaultEscapeKeys(false)
-  // Pressing ⎋ turns off Caps WORD.
-  .escapePassthroughKey("⎋")
-  // Pressing these keys turns off Caps WORD in addition to writing them.
-  .escapeKey(",")
-  .escapeKey(".")
-  .escapeKey("/", "l⇧") // ?
+  .toggle(map("c", "Hyper").build()[0]) // ✦+C
   .build();
 
 // Also deactivate Caps WORD with ␣ in the symbols layer.
 let symbolsLayer = holdTapLayer("␣")
-  .onAlone(toSetVar(capsWordVarName(), 0))
+  .onAlone(disableCapsWordEvents)
   // …
+
+#### Caps WORD limitations
+
+- Caps WORD turns-on ⇪ when active. Your other manipulators should take that
+  into account.
 ```
 
 ## 🔗 See also

@@ -132,7 +132,7 @@ export class HoldTapLayerBuilder {
   /**
    * Adds an event for the layer key is pressed alone.
    */
-  public onAlone(toEvent: ToEvent): this {
+  public onAlone(toEvent: ToEvent | ToEvent[]): this {
     this.layer_builder.configKey((v) => v.toIfAlone(toEvent));
     return this;
   }
