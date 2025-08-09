@@ -163,6 +163,10 @@ export class CapsWordBuilder {
         .escapeKey("␣")
         .escapeKey("l⇧", undefined, "any")
         .escapeKey("r⇧", undefined, "any")
+        .escapeKey("0", "⇧", "any")
+        .escapeKey("close_bracket", undefined, "any")
+        .escapeKey(";", undefined, "any")
+        .escapeKey("'", undefined, "any")
         .escapeKey(",", undefined, "any")
         .escapeKey(".", undefined, "any")
         .escapeKey("/", undefined, "any");

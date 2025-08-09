@@ -120,11 +120,11 @@ let symbolsLayer: Rule = holdTapLayer("␣")
     // Some manipulators that trigger with any modifier, but transform
     // to the function key on ⇧.
     map("m", ["⇧"]).to("f1"),
-    map("m", undefined, "any").to("1"),
+    map("m", [], "any").to("1"),
     map(",", ["⇧"]).to("f2"),
-    map(",", undefined, "any").to("2"),
+    map(",", [], "any").to("2"),
     map(".", ["⇧"]).to("f3"),
-    map(".", undefined, "any").to("3"),
+    map(".", [], "any").to("3"),
     // ...
   )
   // I don’t roll over on these keys, so use the more aggressive strategy.
@@ -298,16 +298,22 @@ let capsWordRule: Rule = capsWord()
   .toggle(map("c", "Hyper").build()[0]) // ✦+C
   .build();
 
-// Also deactivate Caps WORD with ␣ in the symbols layer.
+// Also deactivate Caps WORD with ␣ in the symbols layer and other keys in
+// there.
 let symbolsLayer = holdTapLayer("␣")
+  .allowAnyModifiers()
   .onAlone(disableCapsWordEvents)
+  .permissiveHoldManipulators(
+    map("s", [], ["⇪"]).to("[").to(disableCapsWordEvents),
+    map("x", [], ["⇪"]).to("]").to(disableCapsWordEvents),
+  )
   // …
+```
 
 #### Caps WORD limitations
 
 - Caps WORD turns-on ⇪ when active. Your other manipulators should take that
   into account.
-```
 
 ## 🔗 See also
 

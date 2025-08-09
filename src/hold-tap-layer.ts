@@ -50,9 +50,10 @@ import {
 } from "./karabiner-extra";
 
 function applyConditionsToToEvent(e: ToEvent, ...conds: Condition[]): ToEvent {
+  const originalConditions = e.conditions ?? [];
   return {
     ...e,
-    conditions: conds,
+    conditions: conds.concat(originalConditions),
   };
 }
 
