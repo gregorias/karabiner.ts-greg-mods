@@ -11,6 +11,7 @@ import {
   LetterKeyCode,
   withCondition,
   ModifierParam,
+  FromKeyParam,
 } from "karabiner.ts";
 import { FromAndToKeyParam } from "./karabiner-extra";
 
@@ -69,6 +70,26 @@ export class CapsWordBuilder {
     return this;
   }
 
+  /**
+   * Adds an escape key without an echo.
+   *
+   * Useful for keys like ⎋, where the echo would often be spurious, i.e.,
+   * we only want to exit the Caps WORD mode, not some external mode.
+   */
+  public escapePassthroughKey(
+    key: FromKeyParam,
+    mandatoryModifiers?: FromModifierParam | "" | null,
+    optionalModifiers?: FromModifierParam,
+  ): this {
+    this.layerManipulators.push(
+      ...map(key, mandatoryModifiers, optionalModifiers)
+        .condition(ifVar(capsWordVarName()))
+        .toUnsetVar(capsWordVarName())
+        .build(),
+    );
+    return this;
+  }
+
   public manipulators(manipulators: BasicManipulator[]): this {
     this.layerManipulators.push(
       ...(withCondition(ifVar(capsWordVarName()))(
@@ -91,11 +112,14 @@ export class CapsWordBuilder {
 
     // Deactivators
     if (this.useDefaultEscapeKeys) {
-      this.escapeKey("⎋");
-      this.escapeKey("␣");
-      this.escapeKey(",");
-      this.escapeKey(".");
-      this.escapeKey("/", "⇧");
+      this.escapePassthroughKey("⎋")
+        .escapeKey("⏎", undefined, "any")
+        .escapeKey("␣")
+        .escapeKey("l⇧", undefined, "any")
+        .escapeKey("r⇧", undefined, "any")
+        .escapeKey(",")
+        .escapeKey(".")
+        .escapeKey("/", "⇧");
     }
 
     return rule(this.ruleDescription)

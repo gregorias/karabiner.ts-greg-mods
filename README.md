@@ -290,8 +290,9 @@ writeToProfile("Default profile", [
 let capsWordRule: Rule = capsWord()
   .activator(map("c", "Hyper").build()[0]) // ✦+C
   .defaultEscapeKeys(false)
+  // Pressing ⎋ turns off Caps WORD.
+  .escapePassthroughKey("⎋")
   // Pressing these keys turns off Caps WORD in addition to writing them.
-  .escapeKey("⎋")
   .escapeKey(",")
   .escapeKey(".")
   .escapeKey("/", "l⇧") // ?
