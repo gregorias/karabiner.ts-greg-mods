@@ -109,21 +109,28 @@ With this layer, you don’t lose your keystrokes during simple roll overs.
 
 ```typescript
 // A symbols layer activated with ␣.
-let symbolsBisLayer: Rule = holdTapLayer("␣")
-  // Allow having ⇧ and ⇪ on.
+let symbolsLayer: Rule = holdTapLayer("␣")
+  // Allow having ⇧ and ⇪ on for the layer key.
   .optionalModifiers(["⇧", "⇪"])
   // Use permissive-hold logic for actuating the following manipulators.
   // I don’t want to activate the layer just when I quickly roll over with
   // a ␣.
   .permissiveHoldManipulators(
     // …
-    map("m").to("1"),
-    map(",").to("2"),
-    map(".").to("3")
+    // Some manipulators that trigger with any modifier, but transform
+    // to the function key on ⇧.
+    map("m", ["⇧"]).to("f1"),
+    map("m", undefined, "any").to("1"),
+    map(",", ["⇧"]).to("f2"),
+    map(",", undefined, "any").to("2"),
+    map(".", ["⇧"]).to("f3"),
+    map(".", undefined, "any").to("3"),
     // ...
   )
   // I don’t roll over on these keys, so use the more aggressive strategy.
-  .holdOnOtherKeyPressManipulators([map("[").to("-"), map("]").to("=")])
+  .holdOnOtherKeyPressManipulators([
+    map("[").to("-"),
+    map("]").to("="),])
   // For any key not defined above, we’ll replay them.
   // If we don’t define a key in manipulators or echo keys, they get lost.
   .echoKeys(...allKeys)
