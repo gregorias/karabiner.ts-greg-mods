@@ -4,4 +4,3 @@ export * from "./hrm";
 export * from "./karabiner-extra";
 export * from "./mod-tap";
 export * from "./caps-word";
-export * from "./shift-osm";

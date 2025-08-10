@@ -9,7 +9,6 @@ i.e., it’s good.
 
 Additional features:
 
-- [Shift One Shot Modifier](#shift-osm)
 - [Caps WORD](#caps-word)
 
 ## 🔧 Home row mods tutorial
@@ -124,13 +123,11 @@ let symbolsLayer: Rule = holdTapLayer("␣")
     map(",", ["⇧"]).to("f2"),
     map(",", [], "any").to("2"),
     map(".", ["⇧"]).to("f3"),
-    map(".", [], "any").to("3"),
+    map(".", [], "any").to("3")
     // ...
   )
   // I don’t roll over on these keys, so use the more aggressive strategy.
-  .holdOnOtherKeyPressManipulators([
-    map("[").to("-"),
-    map("]").to("="),])
+  .holdOnOtherKeyPressManipulators([map("[").to("-"), map("]").to("=")])
   // For any key not defined above, we’ll replay them.
   // If we don’t define a key in manipulators or echo keys, they get lost.
   .echoKeys(...allKeys)
@@ -268,25 +265,6 @@ let hrmRule: Manipulator[] = hrm(
 - Key replaying doesn’t work with modified keys. It is technically feasible,
   but I figured that such a capability is not worth additional rules.
 
-### Shift OSM
-
-The shift one shot modifier rule makes a shift tap into a one shot modifier
-that adds a shift modifier to the next tapped key.
-
-It’s a useful modification for avoiding extensive chording.
-Whenever you need to write a capital letter, tap shift and the letter.
-
-#### Shift OSM example configuration
-
-```typescript
-import { shiftOsm } from "karabiner.ts-greg-mods";
-
-writeToProfile("Default profile", [
-  shiftOsm(),
-  // …
-])
-```
-
 ### Caps WORD
 
 [Caps WORD reference at QMK.](https://docs.qmk.fm/features/caps_word)
@@ -305,9 +283,9 @@ let symbolsLayer = holdTapLayer("␣")
   .onAlone(disableCapsWordEvents)
   .permissiveHoldManipulators(
     map("s", [], ["⇪"]).to("[").to(disableCapsWordEvents),
-    map("x", [], ["⇪"]).to("]").to(disableCapsWordEvents),
-  )
-  // …
+    map("x", [], ["⇪"]).to("]").to(disableCapsWordEvents)
+  );
+// …
 ```
 
 #### Caps WORD limitations
