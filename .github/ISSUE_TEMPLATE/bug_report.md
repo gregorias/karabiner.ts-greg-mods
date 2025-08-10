@@ -12,8 +12,8 @@ assignees: ''
 - [ ] I am using the newest Karabiner-elements.
 - [ ] I am using the newest Karabiner.ts.
 - [ ] I am using the newest Karabiner.ts-greg-mods.
-- [ ] I have tried to minimize the config to reasonably ensure the issue is
-      with Greg Mods.
+- [ ] I have tried to minimize the config to ensure the issue is with Greg
+      Mods.
 
 ## Bug description
 
