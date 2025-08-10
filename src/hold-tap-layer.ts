@@ -20,6 +20,11 @@
 // start variable to indicate that the hold-tap key has just been pressed. This
 // variable is unset after the tapping term is over or when another key is
 // pressed.
+//
+// Hold-tap layer has a condition: it doesn’t work if `__layer` is set.
+// This prevents chaining modifiers in home-row mods, but is necessary.
+// Say you have defined ⌘+F to do something special, but that `F` gets
+// intercepted by HRM. `unless(__layer)` prevents that.
 import assert from "assert";
 import {
   BasicManipulator,
