@@ -1,5 +1,5 @@
 import { holdTapLayer, SlowManipulator } from "../src/hold-tap-layer";
-import { map } from "karabiner.ts";
+import { ifVar, map } from "karabiner.ts";
 
 describe("holdTapLayer", () => {
   it("should create a basic hold-tap layer", () => {
@@ -197,5 +197,29 @@ describe("holdTapLayer", () => {
         halt: true,
       },
     ]);
+  });
+
+  it("should add rule-wide conditions", () => {
+    const condition = ifVar("test_condition", 1);
+    const rule = holdTapLayer("a")
+      .condition(condition)
+      .holdOnOtherKeyPressManipulator(map("b").to("c"))
+      .build();
+
+    expect(rule.manipulators).toHaveLength(2);
+
+    const [configManipulator, bManipulator] = rule.manipulators as any[];
+
+    expect(configManipulator.conditions).toEqual(
+      expect.arrayContaining([condition.build()]),
+    );
+
+    expect(bManipulator.conditions).toEqual(
+      expect.arrayContaining([
+        condition.build(),
+        { type: "variable_if", name: "layer-a", value: 1 },
+      ]),
+    );
+    expect(bManipulator.conditions).toHaveLength(2);
   });
 });

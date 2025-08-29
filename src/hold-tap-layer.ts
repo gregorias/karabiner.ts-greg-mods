@@ -46,6 +46,7 @@ import {
   Condition,
   FromAndToKeyCode,
   getKeyWithAlias,
+  ConditionBuilder,
 } from "karabiner.ts";
 import {
   BasicManipulatorBuilder,
@@ -107,6 +108,7 @@ export class HoldTapLayerBuilder {
   private ruleDescription?: string;
   private configKeyOptionalMods?: Modifier[] | ["any"];
   private tappingTermMs?: number;
+  private conditions: Array<Condition | ConditionBuilder> = [];
 
   constructor(key: LayerKeyParam & FromAndToKeyParam) {
     this.key = getKeyWithAlias<FromAndToKeyCode>(key);
@@ -194,12 +196,21 @@ export class HoldTapLayerBuilder {
     return this;
   }
 
+  /**
+   * Sets rule-wide conditions.
+   */
+  public condition(...cs: Array<Condition | ConditionBuilder>): this {
+    this.conditions = cs;
+    return this;
+  }
+
   public build(): Rule {
     if (this.ruleDescription) {
       this.layer_builder.description(this.ruleDescription);
     }
 
-    let rule = this.layer_builder.build();
+    let rule = this.layer_builder.condition(...(this.conditions ?? [])).build();
+
     assert(
       rule.manipulators.length > 0,
       "HoldTapLayerBuilder should have at least one manipulator.",
