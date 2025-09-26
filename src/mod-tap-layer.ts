@@ -12,6 +12,8 @@ import {
   SideModifierAlias,
   KeyAlias,
   Rule,
+  Condition,
+  ConditionBuilder,
 } from "karabiner.ts";
 import { holdTapLayer, HoldTapLayerBuilder } from "./hold-tap-layer";
 import { BasicManipulatorBuilder, FromAndToKeyParam } from "./karabiner-extra";
@@ -50,6 +52,14 @@ export class ModTapLayerBuilder {
    */
   public tappingTerm(tappingTermMs: number): this {
     this.hold_tap_layer_builder.tappingTerm(tappingTermMs);
+    return this;
+  }
+
+  /**
+   * Sets rule-wide conditions.
+   */
+  public condition(...cs: Array<Condition | ConditionBuilder>): this {
+    this.hold_tap_layer_builder.condition(...cs);
     return this;
   }
 
