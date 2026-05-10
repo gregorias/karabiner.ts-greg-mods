@@ -20,6 +20,7 @@ pre-commit:
       run: markdownlint {files}
     yaml-prettier:
       tags: style
+      files: git diff --name-only --cached --diff-filter=AM
       glob: "*.{yml,yaml}"
       run: prettier -c {staged_files}
     test:
@@ -29,3 +30,15 @@ commit-msg:
   commands:
     commitlint:
       run: commitlint --edit={1}
+post-merge:
+  commands:
+    npm-install:
+      files: git diff --name-only HEAD@{1} HEAD
+      glob: "package-lock.json"
+      run: ./.lefthook/post-checkout/npm-install.sh
+post-checkout:
+  commands:
+    npm-install:
+      files: git diff --name-only HEAD@{1} HEAD
+      glob: "package-lock.json"
+      run: ./.lefthook/post-checkout/npm-install.sh
