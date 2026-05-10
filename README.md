@@ -66,10 +66,10 @@ You need to have basic familiarity with the command-line and have
            ["f", "l⌥"],
            ["k", "r⇧"],
            ["l", "r⌘"],
-           [";", "r⌃"]
-         ])
-       ).build()
-     )
+           [";", "r⌃"],
+         ]),
+       ).build(),
+     ),
    ]);
    ```
 
@@ -101,7 +101,7 @@ You need to have basic familiarity with the command-line and have
 > If your hold-tap keys lose character during fast typing with rolls, increase
 > `to_if_held_down_threshold_milliseconds` (400 should be large enough).
 > You may be witnessing
-> [a bug in Karabiner](https://github.com/pqrs-org/Karabiner-Elements/issues/4407).
+> [a bug in Karabiner](https://github.com/pqrs-org/Karabiner-Elements/issues/4407).
 
 ## 🚀 Usage
 
@@ -134,7 +134,7 @@ let symbolsLayer: Rule = holdTapLayer("␣")
     map(",", ["⇧"]).to("f2"),
     map(",", [], "any").to("2"),
     map(".", ["⇧"]).to("f3"),
-    map(".", [], "any").to("3")
+    map(".", [], "any").to("3"),
     // ...
   )
   // I don’t roll over on these keys, so use the more aggressive strategy.
@@ -214,7 +214,7 @@ const simpleHrm: BasicManipulator[] = [
   ...modTap().from(["a", "s"]).modifiers(toKey("l⌃", "l⌘")).build(),
   ...modTap().from(["s", "a"]).modifiers(toKey("l⌃", "l⌘")).build(),
   ...modTap().from("a").modifiers(toKey("l⌃")).build(),
-  ...modTap().from("s").modifiers(toKey("l⌘")).build()
+  ...modTap().from("s").modifiers(toKey("l⌘")).build(),
 ];
 ```
 
@@ -240,8 +240,8 @@ let hrmRule: Manipulator[] = hrm(
     ["j", "r⇧"],
     ["k", "r⇧"],
     ["l", "r⌘"],
-    [";", "r⌃"]
-  ])
+    [";", "r⌃"],
+  ]),
 )
   .lazy(true)
   .holdTapStrategy("permissive-hold")
@@ -255,12 +255,12 @@ let hrmRule: Manipulator[] = hrm(
     map("o").to("←", "l⌘").condition(ifApp("Chrome")),
     // L⌃ + N/P navigate dropdowns.
     map("n").to("↓").condition(unlessKitty),
-    map("p").to("↑").condition(unlessKitty)
+    map("p").to("↑").condition(unlessKitty),
   )
   .smartManipulators(
     "⌃",
     // ⌃W deletes a word.
-    map("w").to("⌫", "l⌥").condition(unlessKitty)
+    map("w").to("⌫", "l⌥").condition(unlessKitty),
   )
   .smartManipulators("l⌥", ...commaPeriodMoveChromeTabs)
   // I press this combo a lot nad it’s hard to roll over it, so use a more
@@ -299,7 +299,7 @@ let symbolsLayer = holdTapLayer("␣")
   .onAlone(disableCapsWordEvents)
   .permissiveHoldManipulators(
     map("s", [], ["⇪"]).to("[").to(disableCapsWordEvents),
-    map("x", [], ["⇪"]).to("]").to(disableCapsWordEvents)
+    map("x", [], ["⇪"]).to("]").to(disableCapsWordEvents),
   );
 // …
 ```
