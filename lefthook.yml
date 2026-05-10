@@ -1,6 +1,9 @@
 pre-commit:
   parallel: true
   commands:
+    lint:
+      tags: style
+      run: npm run lint -- --max-warnings=0
     js-prettier:
       tags: style
       files: git diff --name-only --cached --diff-filter=AM
