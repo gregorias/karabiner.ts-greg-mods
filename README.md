@@ -75,6 +75,10 @@ You need to have basic familiarity with the command-line and have
 
 5. Install the new Karabiner.ts config in Karabiner with `npm run build`.
 
+## ⚡️ Requirements
+
+- [Karabiner v16+](https://github.com/pqrs-org/Karabiner-Elements/releases/tag/v16.0.0)
+
 ## 📦 Installation
 
 ### From source
