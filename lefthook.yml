@@ -1,31 +1,47 @@
 pre-commit:
   parallel: true
   commands:
-    lint:
+    build:
+      tags: build
+      run: just build
+    check-js:
       tags: style
-      run: npm run lint -- --max-warnings=0
-    js-prettier:
-      tags: style
-      files: git diff --name-only --cached --diff-filter=AM
       glob: "*.{js,jsx,mjs,ts,tsx,mts}"
-      run: prettier -c {staged_files}
-    json-prettier:
+      run: just check-js
+    check-json:
       tags: style
       glob: "*.json"
-      run: prettier -c {staged_files}
-    markdownlint:
-      tags: documentation style
-      files: git diff --name-only --cached --diff-filter=AM
-      glob: "*.md"
-      run: markdownlint {files}
-    yaml-prettier:
+      run: just check-json
+    check-yaml:
       tags: style
-      files: git diff --name-only --cached --diff-filter=AM
       glob: "*.{yml,yaml}"
-      run: prettier -c {staged_files}
+      run: just check-yaml
+    lint-js:
+      tags: lint
+      glob: "*.{js,jsx,mjs,ts,tsx,mts}"
+      run: just lint-js
+    lint-markdown:
+      tags: documentation style
+      glob: "*.md"
+      run: just lint-markdown
     test:
       tags: test
-      run: npm run test
+      run: just test
+format:
+  parallel: true
+  commands:
+    format-js:
+      tags: style
+      glob: "*.{js,jsx,mjs,ts,tsx,mts}"
+      run: just format-js
+    format-json:
+      tags: style
+      glob: "*.json"
+      run: just format-json
+    format-yaml:
+      tags: style
+      glob: "*.{yml,yaml}"
+      run: just format-yaml
 commit-msg:
   commands:
     commitlint:
