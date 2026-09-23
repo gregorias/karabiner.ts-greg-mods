@@ -4,101 +4,102 @@ import {
   getFromKeyCodeFromBasicManipulator,
   isSidedMod,
   getUnsidedMod,
-} from '../src/karabiner-extra';
+} from "../src/karabiner-extra";
 import {
   BasicManipulator,
   map,
   Modifier,
   SideModifierAlias,
-} from 'karabiner.ts';
+} from "karabiner.ts";
 
-describe('isFromAndToKeyCode', () => {
-  it('should return true for valid key codes', () => {
-    expect(isFromAndToKeyCode('spacebar')).toBe(true);
-    expect(isFromAndToKeyCode('left_shift')).toBe(true);
-    expect(isFromAndToKeyCode('a')).toBe(true);
-    expect(isFromAndToKeyCode('1')).toBe(true);
-    expect(isFromAndToKeyCode('f1')).toBe(true);
-    expect(isFromAndToKeyCode('keypad_1')).toBe(true);
-    expect(isFromAndToKeyCode('international1')).toBe(true);
+describe("isFromAndToKeyCode", () => {
+  it("should return true for valid key codes", () => {
+    expect(isFromAndToKeyCode("spacebar")).toBe(true);
+    expect(isFromAndToKeyCode("left_shift")).toBe(true);
+    expect(isFromAndToKeyCode("a")).toBe(true);
+    expect(isFromAndToKeyCode("1")).toBe(true);
+    expect(isFromAndToKeyCode("f1")).toBe(true);
+    expect(isFromAndToKeyCode("keypad_1")).toBe(true);
+    expect(isFromAndToKeyCode("international1")).toBe(true);
   });
 
-  it('should return false for invalid key codes', () => {
-    expect(isFromAndToKeyCode('not_a_key')).toBe(false);
+  it("should return false for invalid key codes", () => {
+    expect(isFromAndToKeyCode("not_a_key")).toBe(false);
     expect(isFromAndToKeyCode(123)).toBe(false);
-    expect(isFromAndToKeyCode('shift')).toBe(false);
+    expect(isFromAndToKeyCode("shift")).toBe(false);
   });
 });
 
-describe('getSideOfMod', () => {
-  it('should return the correct side for sided modifiers', () => {
-    expect(getSideOfMod('left_shift')).toBe('left');
-    expect(getSideOfMod('right_control')).toBe('right');
-    expect(getSideOfMod('<⇧')).toBe('left');
-    expect(getSideOfMod('>⌃')).toBe('right');
-    expect(getSideOfMod('l⌥')).toBe('left');
-    expect(getSideOfMod('r⌥')).toBe('right');
+describe("getSideOfMod", () => {
+  it("should return the correct side for sided modifiers", () => {
+    expect(getSideOfMod("left_shift")).toBe("left");
+    expect(getSideOfMod("right_control")).toBe("right");
+    expect(getSideOfMod("<⇧")).toBe("left");
+    expect(getSideOfMod(">⌃")).toBe("right");
+    expect(getSideOfMod("l⌥")).toBe("left");
+    expect(getSideOfMod("r⌥")).toBe("right");
   });
 
-  it('should return null for non-sided modifiers', () => {
-    expect(getSideOfMod('shift')).toBe(null);
-    expect(getSideOfMod('any' as SideModifierAlias)).toBe(null);
-  });
-});
-
-describe('isSidedMod', () => {
-  it('should return true for sided modifiers', () => {
-    expect(isSidedMod('left_shift')).toBe(true);
-    expect(isSidedMod('right_control')).toBe(true);
-    expect(isSidedMod('<⇧')).toBe(true);
-    expect(isSidedMod('>⌃')).toBe(true);
-    expect(isSidedMod('l⌥')).toBe(true);
-    expect(isSidedMod('r⌥')).toBe(true);
-  });
-
-  it('should return false for non-sided modifiers', () => {
-    expect(isSidedMod('shift')).toBe(false);
-    expect(isSidedMod('any' as SideModifierAlias)).toBe(false);
+  it("should return null for non-sided modifiers", () => {
+    expect(getSideOfMod("shift")).toBe(null);
+    expect(getSideOfMod("any" as SideModifierAlias)).toBe(null);
   });
 });
 
-describe('getUnsidedMod', () => {
-  it('should return the unsided version for sided modifiers', () => {
-    expect(getUnsidedMod('left_shift' as Modifier)).toBe('shift');
-    expect(getUnsidedMod('right_control' as Modifier)).toBe('control');
+describe("isSidedMod", () => {
+  it("should return true for sided modifiers", () => {
+    expect(isSidedMod("left_shift")).toBe(true);
+    expect(isSidedMod("right_control")).toBe(true);
+    expect(isSidedMod("<⇧")).toBe(true);
+    expect(isSidedMod(">⌃")).toBe(true);
+    expect(isSidedMod("l⌥")).toBe(true);
+    expect(isSidedMod("r⌥")).toBe(true);
   });
 
-  it('should return the same modifier for unsided modifiers', () => {
-    expect(getUnsidedMod('shift')).toBe('shift');
-    expect(getUnsidedMod('control')).toBe('control');
+  it("should return false for non-sided modifiers", () => {
+    expect(isSidedMod("shift")).toBe(false);
+    expect(isSidedMod("any" as SideModifierAlias)).toBe(false);
   });
 });
 
-describe('getFromKeyCodeFromBasicManipulator', () => {
-  it('should return the key code from a manipulator', () => {
+describe("getUnsidedMod", () => {
+  it("should return the unsided version for sided modifiers", () => {
+    expect(getUnsidedMod("left_shift" as Modifier)).toBe("shift");
+    expect(getUnsidedMod("right_control" as Modifier)).toBe("control");
+  });
+
+  it("should return the same modifier for unsided modifiers", () => {
+    expect(getUnsidedMod("shift")).toBe("shift");
+    expect(getUnsidedMod("control")).toBe("control");
+  });
+});
+
+describe("getFromKeyCodeFromBasicManipulator", () => {
+  it("should return the key code from a manipulator", () => {
     const manipulator: BasicManipulator = {
-      type: 'basic',
-      from: { key_code: 'a' },
+      type: "basic",
+      from: { key_code: "a" },
     };
-    expect(getFromKeyCodeFromBasicManipulator(manipulator)).toBe('a');
+    expect(getFromKeyCodeFromBasicManipulator(manipulator)).toBe("a");
   });
 
-  it('should return the key code from a key alias manipulator', () => {
-    expect(getFromKeyCodeFromBasicManipulator(map('␣').to("b").build()[0]))
-      .toBe('spacebar');
+  it("should return the key code from a key alias manipulator", () => {
+    expect(
+      getFromKeyCodeFromBasicManipulator(map("␣").to("b").build()[0]),
+    ).toBe("spacebar");
   });
 
-  it('should return null if from does not have key_code', () => {
+  it("should return null if from does not have key_code", () => {
     const manipulator: BasicManipulator = {
-      type: 'basic',
-      from: { consumer_key_code: 'rewind' },
+      type: "basic",
+      from: { consumer_key_code: "rewind" },
     };
     expect(getFromKeyCodeFromBasicManipulator(manipulator)).toBe(null);
   });
 
-  it('should return null if key_code is a number', () => {
+  it("should return null if key_code is a number", () => {
     const manipulator: BasicManipulator = {
-      type: 'basic',
+      type: "basic",
       from: { key_code: 123 },
     };
     expect(getFromKeyCodeFromBasicManipulator(manipulator)).toBe(null);

@@ -167,9 +167,7 @@ export const qwertyLayout: HrmKeyboardLayout = new HrmKeyboardLayout(
 );
 
 export type HoldTapStrategy =
-  | "permissive-hold"
-  | "hold-on-other-key-press"
-  | "slow";
+  "permissive-hold" | "hold-on-other-key-press" | "slow";
 
 /**
  * Given a key and a keyboard layout, returns which side ('left' | 'right') the key is on,

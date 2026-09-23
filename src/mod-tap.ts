@@ -64,9 +64,7 @@ export class ModTapBuilder {
 
   public from(
     keyCodeAlias:
-      | FromAndToKeyCode
-      | KeyAlias
-      | Array<FromAndToKeyCode | KeyAlias>,
+      FromAndToKeyCode | KeyAlias | Array<FromAndToKeyCode | KeyAlias>,
     mandatoryModifiers?: FromModifierParam & ModifierParam,
     optionalModifiers?: FromModifierParam,
   ): this {
