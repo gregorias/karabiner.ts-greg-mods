@@ -30,15 +30,3 @@ commit-msg:
   commands:
     commitlint:
       run: commitlint --edit={1}
-post-merge:
-  commands:
-    npm-install:
-      files: git diff --name-only HEAD@{1} HEAD
-      glob: "package-lock.json"
-      run: ./.lefthook/post-checkout/npm-install.sh
-post-checkout:
-  commands:
-    npm-install:
-      files: git diff --name-only HEAD@{1} HEAD
-      glob: "package-lock.json"
-      run: ./.lefthook/post-checkout/npm-install.sh
