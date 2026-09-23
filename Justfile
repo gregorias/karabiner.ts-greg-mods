@@ -2,6 +2,13 @@
 default:
     @just --list
 
+# Initialize Jujutsu
+init-jj:
+    test -d .jj || jj git init
+    jj config set --repo 'aliases.check' '["util", "exec", "--", "sh", "-c", "\"$JJ_WORKSPACE_ROOT/scripts/check.sh\" \"$@\"", "check"]'
+    jj config set --repo 'aliases.ship' '["util", "exec", "--", "sh", "-c", "\"$JJ_WORKSPACE_ROOT/scripts/ship.sh\" \"$@\"", "ship"]'
+    jj config set --repo remotes.origin.auto-track-bookmarks '"*"'
+
 # Install NPM dependencies from the lock file.
 install-package-lock:
     npm install
@@ -56,8 +63,14 @@ lint-js:
 lint-markdown:
     fd -e md -X markdownlint
 
+# Lint commit message
+lint-commit-msg:
+    jj log --no-graph -r "${JJ_COMMIT_ID:-@}" -T description | commitlint
+
 # Release package
 release: build test
     ./scripts/release.sh
 
+alias check-commit := lint-commit-msg
+alias lint-commit := lint-commit-msg
 alias validate-json := check-json

@@ -6,22 +6,30 @@ This is the documentation file for developers.
 
 This section describes how to setup your development environment.
 
-1. Install Lefthook:
+This repo requires the following tools:
 
-    ```shell
-    lefthook install
-    ```
+- [Jujutsu]
+- [Just]
+- [Lefthook]
+- [Markdownlint]
+- [Prettier]
 
 1. Initialize NPM:
 
-    ```shell
-    npm install
-    ```
+   ```shell
+   npm install
+   ```
+
+1. Initialize Jujutsu in the repository:
+
+   ```shell
+   just init-jj
+   ```
 
 ## Implementation
 
-This diagram describes the high-level state transitions for a
-permissive hold manipulator within a mod-tap layer.
+This diagram describes the high-level state transitions for a permissive hold
+manipulator within a mod-tap layer.
 
 ```mermaid
 ---
@@ -59,3 +67,9 @@ stateDiagram-v2
     TwoKeyPress --> Hold: other ↑ (→ mod-other)
     TwoKeyPress --> Idle: l↑o↑ (→ replay)
 ```
+
+[Jujutsu]: https://github.com/jj-vcs/jj
+[Just]: https://just.systems/
+[Lefthook]: https://lefthook.dev/
+[Markdownlint]: https://github.com/igorshubovych/markdownlint-cli
+[Prettier]: https://prettier.io/
