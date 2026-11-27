@@ -144,7 +144,10 @@ describe("holdTapLayer", () => {
       ]),
     );
     expect(ifManipulator.from).toEqual({ key_code: "b" });
-    expect(ifManipulator.to).toBeUndefined();
+    // A no-op output, so that Karabiner 17+ cancels the layer key's tap.
+    expect(ifManipulator.to).toEqual([
+      { set_variable: { name: "layer-a-start", value: 1 } },
+    ]);
     expect(ifManipulator.to_delayed_action).toEqual({
       to_if_invoked: [],
       to_if_canceled: [

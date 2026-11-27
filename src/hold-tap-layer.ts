@@ -336,7 +336,20 @@ export class HoldTapLayerBuilder {
     phManipulator.to_after_key_up = toEvents.concat(
       phManipulator.to_after_key_up ?? [],
     );
-    phManipulator.to = undefined;
+    // Output a no-op on key down to cancel the layer key's tap. (The start
+    // variable is already 1, because this manipulator requires it.)
+    //
+    // The layer key taps itself on release (`to_if_alone`) unless another key
+    // press cancels that tap. Since Karabiner 17, only a key press that
+    // produces output cancels it
+    // (https://github.com/pqrs-org/Karabiner-Elements/commit/bb50970de5f8989fc65c351e585308df8eb42dbb),
+    // and this manipulator defers all of its real output to key up. Without
+    // the no-op, with "a" as the layer key and "b" as this key:
+    //
+    // - Rolling a↓ b↓ a↑ b↑ types "aab" instead of "ab": a↑ taps "a", and then
+    //   b↑ replays "a" and "b".
+    // - Holding a↓ b↓ b↑ a↑ sends the hold action for "b" and then a stray "a".
+    phManipulator.to = [toSetVar(this.startVariable, 1)];
     // If the layer became inactive (interleaved taps), replay the keys.
     phManipulator.to_after_key_up.push(
       {
