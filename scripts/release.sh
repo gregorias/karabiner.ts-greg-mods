@@ -5,6 +5,12 @@ set -euo pipefail
 # The bookmark that release commits go on in Jujutsu repositories.
 release_bookmark=main
 
+# Fail before tagging and pushing if publishing would fail.
+if ! npm whoami >/dev/null 2>&1; then
+  echo "Not logged in to npm. Run \`npm login\` before releasing." >&2
+  exit 1
+fi
+
 use_jj=false
 if [ -d .jj ]; then
   use_jj=true
